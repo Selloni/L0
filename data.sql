@@ -1,55 +1,68 @@
-CREATE TABLE orders (
-                        order_uid TEXT,
-                        track_number TEXT,
-                        entry TEXT,
-                        delivery JSONB,
-                        payment JSONB,
-                        items JSONB,
-                        locale TEXT,
-                        internal_signature TEXT,
-                        customer_id TEXT,
-                        delivery_service TEXT,
-                        shardkey TEXT,
-                        sm_id INTEGER,
-                        date_created TIMESTAMP,
-                        oof_shard TEXT
-);
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS delivery;
+DROP TABLE IF EXISTS payment;
+DROP TABLE IF EXISTS items;
+
+
 
 CREATE TABLE delivery (
-                          name TEXT,
-                          phone TEXT,
-                          zip TEXT,
-                          city TEXT,
-                          address TEXT,
-                          region TEXT,
-                          email TEXT
+    id SERIAL PRIMARY KEY,
+    name TEXT,
+    phone TEXT,
+    zip TEXT,
+    city TEXT,
+    address TEXT,
+    region TEXT,
+    email TEXT
 );
 
 
 CREATE TABLE payment (
-                         transaction TEXT,
-                         request_id TEXT,
-                         currency TEXT,
-                         provider TEXT,
-                         amount INTEGER,
-                         payment_dt INTEGER,
-                         bank TEXT,
-                         delivery_cost INTEGER,
-                         goods_total INTEGER,
-                         custom_fee INTEGER
+    id SERIAL PRIMARY KEY,
+    transaction TEXT,
+    request_id TEXT,
+    currency TEXT,
+    provider TEXT,
+    amount INTEGER,
+    payment_dt INTEGER,
+    bank TEXT,
+    delivery_cost INTEGER,
+    goods_total INTEGER,
+    custom_fee INTEGER
 );
 
 
 CREATE TABLE items (
-                       chrt_id INTEGER,
-                       track_number TEXT,
-                       price INTEGER,
-                       rid TEXT,
-                       name TEXT,
-                       sale INTEGER,
-                       size TEXT,
-                       total_price INTEGER,
-                       nm_id INTEGER,
-                       brand TEXT,
-                       status INTEGER
+    id SERIAL PRIMARY KEY,
+    chrt_id INTEGER,
+    track_number TEXT,
+    price INTEGER,
+    rid TEXT,
+    name TEXT,
+    sale INT,
+    size TEXT,
+    total_price INTEGER,
+    nm_id INTEGER,
+    brand TEXT,
+    status INTEGER
+);
+
+CREATE TABLE orders (
+    order_uid TEXT,
+    track_number TEXT,
+    entry TEXT,
+    delivery_id SERIAL,
+    payment_id SERIAL,
+    item_id SERIAL,
+    locale TEXT,
+    internal_signature TEXT,
+    customer_id TEXT,
+    delivery_service TEXT,
+    shardkey TEXT,
+    sm_id INTEGER,
+    date_created TIMESTAMP,
+    oof_shard TEXT,
+    FOREIGN KEY (delivery_id) REFERENCES delivery (id),
+    FOREIGN KEY (payment_id) REFERENCES payment (id),
+    FOREIGN KEY (item_id) REFERENCES items (id)
 );
