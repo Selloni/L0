@@ -1,6 +1,11 @@
 package db
 
-import "time"
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+	"time"
+)
 
 type Order struct {
 	OrderUID          string    `json:"order_uid"`
@@ -54,4 +59,19 @@ type Items struct {
 	NmID        int    `json:"nm_id"`
 	Brand       string `json:"brand"`
 	Status      int    `json:"status"`
+}
+
+func (o *Order) OpenFile(path *string) ([]byte, error) {
+	data, err := os.ReadFile(*path)
+	if err != nil {
+		return nil, fmt.Errorf("could not open the file, err: %v", err)
+	}
+	return data, err
+}
+
+func (o *Order) ReadFile(data []byte) error {
+	if err := json.Unmarshal(data, &o); err != nil {
+		return err
+	}
+	return nil
 }
