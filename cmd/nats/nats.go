@@ -28,7 +28,8 @@ func main() {
 }
 
 func ConnectNATS() (stan.Conn, error) {
-	sc, err := stan.Connect("cluster", "client")
+	sc, err := stan.Connect("test-cluster", "test-client",
+		stan.NatsURL("nats://localhost:4222"))
 	if err != nil {
 		return nil, fmt.Errorf("Expected to connect correctly, got err %v", err)
 	}
@@ -37,23 +38,8 @@ func ConnectNATS() (stan.Conn, error) {
 		log.Printf("Received message: %s", string(msg.Data))
 	}, stan.DurableName("i-will-remember"))
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer sub.Unsubscribe()
 	return sc, nil
-	//
-	////// что то что бы запоминать переданное сообщение
-	//handle := func(msg *stan.Msg) {
-	//	// ...
-	//}
-	//
-	//sub, err = sc.Subscribe(
-	//	"stream-name",
-	//	handle,
-	//	stan.DurableName("i-will-remember"),
-	//)
-	//if err != nil {
-	//	return nil, err
-	//}
-	/////////////////
 }
