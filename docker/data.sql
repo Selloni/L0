@@ -39,21 +39,21 @@ CREATE TABLE items (
     price INTEGER,
     rid TEXT,
     name TEXT,
-    sale INT,
+    sale INTEGER,
     size TEXT,
     total_price INTEGER,
     nm_id INTEGER,
     brand TEXT,
     status INTEGER
 );
-
+-- REFERENCES delivery (id) NOT NULL
 CREATE TABLE orders (
     order_uid TEXT,
     track_number TEXT,
     entry TEXT,
-    delivery_id SERIAL,
-    payment_id SERIAL,
-    item_id SERIAL,
+    delivery_id INTEGER,
+    payment_id INTEGER,
+    item_id INTEGER,
     locale TEXT,
     internal_signature TEXT,
     customer_id TEXT,

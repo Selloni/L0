@@ -1,17 +1,40 @@
 package main
 
 import (
+	"L0/interal/db"
+	"L0/pkg/posgresql"
+	"flag"
 	"fmt"
 	"github.com/nats-io/stan.go"
 	"log"
 )
 
 func main() {
-	nats, err := ConnectNATS()
+	order := db.Order{}
+	path := flag.String("json", "order.json", "path to file json")
+	flag.Parse()
+	log.Println(*path)
+	data, err := order.OpenFile(path)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(nats)
+	if err = order.ReadFile(data); err != nil {
+		log.Fatal(err)
+	}
+	//fmt.Println(order)
+	psql, err := posgresql.ConnectPsql()
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = posgresql.InsertOrder(psql, &order)
+	if err != nil {
+		log.Fatal(err)
+	}
+	//nats, err := ConnectNATS()
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//fmt.Println(nats)
 }
 
 func ConnectNATS() (stan.Conn, error) {

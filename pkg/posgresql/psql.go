@@ -10,16 +10,16 @@ import (
 
 const QuerOrder = "INSERT INTO orders " +
 	"(order_uid, track_number, entry, locale, internal_signature, customer_id, delivery_service, shardkey, sm_id, date_created, oof_shard) " +
-	"VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)"
+	"VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)"
 const QuerDelivery = "INSERT INTO delivery " +
 	"(name, phone, zip, city, address, region, email) " +
-	"VALUES ($1, $2, $3, $4, $5, $6, $7) returning delivery_uid"
-const QuerPayment = "INSERT INTO payments " +
+	"VALUES ($1, $2, $3, $4, $5, $6, $7)"
+const QuerPayment = "INSERT INTO payment " +
 	"(transaction, request_id, currency, provider, amount, payment_dt, bank, delivery_cost, goods_total, custom_fee) " +
-	"VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) returning payment_id"
+	"VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)"
 const QuerItems = "INSERT INTO items " +
 	"(chrt_id, track_number, price, rid, name, sale, size, total_price, nm_id, brand, status) " +
-	"VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) ON CONFLICT (rid) DO NOTHING"
+	"VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)"
 
 type ConfigPsql struct {
 	Name, Pass, Host, Port, Database string
@@ -76,30 +76,31 @@ func InsertOrder(pool *pgxpool.Pool, data *db.Order) error {
 		data.InternalSignature, data.CustomerID, data.DeliveryService,
 		data.Shardkey, data.SmID, data.DateCreated, data.OofShard,
 	); err != nil {
-		return err
+		return fmt.Errorf("failed to transfer order to db :%v", err)
 	}
 	delivery := data.Delivery
 	if _, err = conn.Exec(context.Background(), QuerDelivery,
 		delivery.Name, delivery.Phone, delivery.Zip, delivery.City,
 		delivery.Address, delivery.Region, delivery.Email,
 	); err != nil {
-		return err
+		return fmt.Errorf("delivery: %v", err)
 	}
 	payment := data.Payment
 	if _, err = conn.Exec(context.Background(), QuerPayment,
-		payment.Transaction, payment.RequestID, payment.Currency, payment.Provider,
-		payment.PaymentDt, payment.Bank, payment.DeliveryCost, payment.GoodsTotal, payment.CustomFee,
+		payment.Transaction, payment.RequestID, payment.Currency,
+		payment.Provider, payment.Amount, payment.PaymentDt, payment.Bank,
+		payment.DeliveryCost, payment.GoodsTotal, payment.CustomFee,
 	); err != nil {
-		return err
+		return fmt.Errorf("payment: %v", err)
 	}
 	item := data.Items
 	for i := 0; i < len(item); i++ {
-		if _, err = conn.Exec(context.Background(), QuerDelivery,
+		if _, err = conn.Exec(context.Background(), QuerItems,
 			item[i].ChrtID, item[i].TrackNumber, item[i].Price,
-			item[i].Rid, item[i].Name, item[i].Sale, item[i].Sale,
+			item[i].Rid, item[i].Name, item[i].Sale, item[i].Size,
 			item[i].TotalPrice, item[i].NmID, item[i].Brand, item[i].Status,
 		); err != nil {
-			return err
+			return fmt.Errorf("item[%d]: %v", i, err)
 		}
 	}
 	return nil
