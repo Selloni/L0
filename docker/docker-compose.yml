@@ -6,8 +6,8 @@ services:
       POSTGRES_DB: "postgres"
       POSTGRES_USER: "grandpat"
       POSTGRES_PASSWORD: "grandpat"
-#    volumes:
-#      - ./data.sql:/docker-entrypoint-initdb.d
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
   nats-streaming:
