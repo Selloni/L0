@@ -17,6 +17,22 @@ CREATE TABLE delivery (
 );
 
 
+CREATE OR REPLACE FUNCTION trigger_delivery_id()
+    RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO orders(delivery_id) VALUES (NEW.id);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER trigger_delivery
+    AFTER INSERT ON delivery
+    FOR EACH ROW
+EXECUTE FUNCTION trigger_delivery_id();
+
+
+
 CREATE TABLE payment (
     id SERIAL PRIMARY KEY,
     transaction TEXT,
@@ -32,6 +48,20 @@ CREATE TABLE payment (
 );
 
 
+CREATE OR REPLACE FUNCTION trigger_payment_id()
+    RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO orders(payment_id) VALUES (NEW.id);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER trigger_payment
+    AFTER INSERT ON payment
+    FOR EACH ROW
+EXECUTE FUNCTION trigger_payment_id();
+
 CREATE TABLE items (
     id SERIAL PRIMARY KEY,
     chrt_id INTEGER,
@@ -46,6 +76,23 @@ CREATE TABLE items (
     brand TEXT,
     status INTEGER
 );
+
+
+CREATE OR REPLACE FUNCTION trigger_items_id()
+    RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO orders(item_id) VALUES (NEW.id);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER trigger_items
+    AFTER INSERT ON items
+    FOR EACH ROW
+EXECUTE FUNCTION trigger_delivery_id();
+
+
 -- REFERENCES delivery (id) NOT NULL
 CREATE TABLE orders (
     order_uid TEXT,
@@ -62,8 +109,7 @@ CREATE TABLE orders (
     sm_id INTEGER,
     date_created TIMESTAMP,
     oof_shard TEXT
---     FOREIGN KEY (delivery_id) REFERENCES delivery (id),
---     FOREIGN KEY (payment_id) REFERENCES payment (id),
---     FOREIGN KEY (item_id) REFERENCES items (id)
 );
+
+
 
