@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS items;
 
 
 CREATE TABLE delivery (
-    id SERIAL PRIMARY KEY,
+    order_uid TEXT,
     name TEXT,
     phone TEXT,
     zip TEXT,
@@ -15,24 +15,8 @@ CREATE TABLE delivery (
     email TEXT
 );
 
-CREATE OR REPLACE FUNCTION trigger_delivery_id()
-    RETURNS TRIGGER AS $$
-BEGIN
-    INSERT INTO orders VALUES (NEW.id);
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-
-CREATE TRIGGER trigger_delivery
-    BEFORE INSERT ON delivery
-    FOR EACH ROW
-EXECUTE FUNCTION trigger_delivery_id();
-
-
-
 CREATE TABLE payment (
-    id SERIAL PRIMARY KEY,
+    order_uid TEXT,
     transaction TEXT,
     request_id TEXT,
     currency TEXT,
@@ -45,23 +29,8 @@ CREATE TABLE payment (
     custom_fee BIGINT
 );
 
-
-CREATE OR REPLACE FUNCTION trigger_payment_id()
-    RETURNS TRIGGER AS $$
-BEGIN
-    INSERT INTO orders(payment_id) VALUES (NEW.id);
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-
-CREATE TRIGGER trigger_payment
-    BEFORE INSERT ON payment
-    FOR EACH ROW
-EXECUTE FUNCTION trigger_payment_id();
-
 CREATE TABLE items (
-    id SERIAL PRIMARY KEY,
+    order_uid TEXT,
     chrt_id BIGINT,
     track_number TEXT,
     price BIGINT,
@@ -75,30 +44,13 @@ CREATE TABLE items (
     status BIGINT
 );
 
-
-CREATE OR REPLACE FUNCTION trigger_items_id()
-    RETURNS TRIGGER AS $$
-BEGIN
-    INSERT INTO orders(item_id) VALUES (NEW.id);
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-
-CREATE TRIGGER trigger_items
-    BEFORE INSERT ON items
-    FOR EACH ROW
-EXECUTE FUNCTION trigger_delivery_id();
-
-
--- REFERENCES delivery (id) NOT NULL
 CREATE TABLE orders (
     order_uid TEXT,
     track_number TEXT,
     entry TEXT,
-    delivery_id BIGINT ,
-    payment_id BIGINT ,
-    item_id BIGINT ,
+--     delivery_id BIGINT ,
+--     payment_id BIGINT ,
+--     item_id BIGINT ,
     locale TEXT,
     internal_signature TEXT,
     customer_id TEXT,
@@ -107,9 +59,9 @@ CREATE TABLE orders (
     sm_id BIGINT,
     date_created TIMESTAMP,
     oof_shard TEXT
---     FOREIGN KEY (delivery_id) REFERENCES delivery (id),
---     FOREIGN KEY (payment_id) REFERENCES payment (id),
---     FOREIGN KEY (item_id) REFERENCES items (id)
+--     FOREIGN KEY (order_uid) REFERENCES delivery (order_uid),
+--     FOREIGN KEY (order_uid) REFERENCES payment (order_uid),
+--     FOREIGN KEY (order_uid) REFERENCES items (order_uid)
 );
 
 
