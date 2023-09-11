@@ -48,9 +48,6 @@ CREATE TABLE orders (
     order_uid TEXT,
     track_number TEXT,
     entry TEXT,
---     delivery_id BIGINT ,
---     payment_id BIGINT ,
---     item_id BIGINT ,
     locale TEXT,
     internal_signature TEXT,
     customer_id TEXT,
@@ -59,9 +56,6 @@ CREATE TABLE orders (
     sm_id BIGINT,
     date_created TIMESTAMP,
     oof_shard TEXT
---     FOREIGN KEY (order_uid) REFERENCES delivery (order_uid),
---     FOREIGN KEY (order_uid) REFERENCES payment (order_uid),
---     FOREIGN KEY (order_uid) REFERENCES items (order_uid)
 );
 
 

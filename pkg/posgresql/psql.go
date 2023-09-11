@@ -56,15 +56,6 @@ func NewClient(ctx context.Context, con ConfigPsql) (*pgxpool.Pool, error) {
 
 }
 
-//func InsertData(pool *pgxpool.Pool, order *db.Order, delivery db.Delivery, payment db.Payment,items db.Items) {
-// conn, err := pool.Acquire(context.Background())
-// if err != nil {
-//	 return fmt.Errorf("failed to get connections: %v", err)
-// }
-// defer conn.Release()
-// InsertOrder(conn, &db.Order{})
-//}
-
 func InsertOrder(pool *pgxpool.Pool, data *db.Order) error {
 	conn, err := pool.Acquire(context.Background())
 	if err != nil {
@@ -105,52 +96,3 @@ func InsertOrder(pool *pgxpool.Pool, data *db.Order) error {
 	}
 	return nil
 }
-
-//
-//func InsertDelivery(pool *pgxpool.Pool, data *db.Delivery) error {
-//	conn, err := pool.Acquire(context.Background())
-//	if err != nil {
-//		return fmt.Errorf("failed to get connections: %v", err)
-//	}
-//	defer conn.Release()
-//	_, err = conn.Exec(context.Background(), QuerDelivery,
-//		data.Name, data.Phone, data.Zip, data.City,
-//		data.Address, data.Region, data.Email,
-//	)
-//	if err != nil {
-//		return err
-//	}
-//	return nil
-//}
-//
-//func InsertPayment(pool *pgxpool.Pool, data *db.Payment) error {
-//	conn, err := pool.Acquire(context.Background())
-//	if err != nil {
-//		return fmt.Errorf("failed to get connections: %v", err)
-//	}
-//	defer conn.Release()
-//	_, err = conn.Exec(context.Background(), QuerPayment,
-//		data.Transaction, data.RequestID, data.Currency, data.Provider,
-//		data.PaymentDt, data.Bank, data.DeliveryCost, data.GoodsTotal, data.CustomFee,
-//	)
-//	if err != nil {
-//		return err
-//	}
-//	return nil
-//}
-
-//func InsertItems(pool *pgxpool.Pool, data *db.Delivery) error {
-//	conn, err := pool.Acquire(context.Background())
-//	if err != nil {
-//		return fmt.Errorf("failed to get connections: %v", err)
-//	}
-//	defer conn.Release()
-//	_, err = conn.Exec(context.Background(), QuerDelivery,
-//		data.Name, data.Phone, data.Zip, data.City,
-//		data.Address, data.Region, data.Email,
-//	)
-//	if err != nil {
-//		return err
-//	}
-//	return nil
-//}
