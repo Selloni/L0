@@ -25,6 +25,7 @@ type Order struct {
 }
 
 type Delivery struct {
+	Id      int    `json:"id"`
 	Name    string `json:"name"`
 	Phone   string `json:"phone"`
 	Zip     string `json:"zip"`
@@ -35,6 +36,7 @@ type Delivery struct {
 }
 
 type Payment struct {
+	Id           int    `json:"id"`
 	Transaction  string `json:"transaction"`
 	RequestID    string `json:"request_id"`
 	Currency     string `json:"currency"`
@@ -48,6 +50,7 @@ type Payment struct {
 }
 
 type Items struct {
+	Id          int    `json:"id"`
 	ChrtID      int    `json:"chrt_id"`
 	TrackNumber string `json:"track_number"`
 	Price       int    `json:"price"`
