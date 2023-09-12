@@ -20,14 +20,15 @@ func main() {
 	flag.Parse()
 	router := httprouter.New()
 	log.Println("register user handler")
-	handler := user.NewHandler()
-	handler.Register(router)
+
 	Run(path, router)
 }
 
 func Run(path *string, router *httprouter.Router) {
 	order := db.Order{}
 	cash := inmemory.NewCash()
+	handler := user.NewHandler(&cash)
+	handler.Register(router)
 	log.Println(*path)
 	data, err := order.OpenFile(path)
 	if err != nil {

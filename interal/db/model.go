@@ -78,3 +78,16 @@ func (o *Order) ReadFile(data []byte) error {
 	}
 	return nil
 }
+
+//
+//func (o *Order) GetAllOrders(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
+//	for
+//
+//	if _, err := w.Write([]byte("Get all list")); err != nil {
+//		log.Fatal(err)
+//	}
+//}
+//
+//func (o *Order) GetOrder(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
+//	w.Write([]byte(o.DeliveryService))
+//}

@@ -15,6 +15,10 @@ func NewCash() inMemory {
 	}
 }
 
+func (m *inMemory) GetStore() *map[string]db.Order {
+	return &m.store
+}
+
 func (m *inMemory) Add(order *db.Order) error {
 	if _, ok := m.store[order.OrderUID]; !ok {
 		m.store[order.OrderUID] = *order
