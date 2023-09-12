@@ -53,7 +53,6 @@ func NewClient(ctx context.Context, con ConfigPsql) (*pgxpool.Pool, error) {
 		log.Fatal(err)
 	}
 	return pool, nil
-
 }
 
 func InsertOrder(pool *pgxpool.Pool, data *db.Order) error {

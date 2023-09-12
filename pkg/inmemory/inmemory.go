@@ -5,21 +5,21 @@ import (
 	"fmt"
 )
 
-type inMemory struct {
+type InMemory struct {
 	store map[string]db.Order
 }
 
-func NewCash() inMemory {
-	return inMemory{
+func NewCash() InMemory {
+	return InMemory{
 		store: make(map[string]db.Order),
 	}
 }
 
-func (m *inMemory) GetStore() *map[string]db.Order {
+func (m *InMemory) GetStore() *map[string]db.Order {
 	return &m.store
 }
 
-func (m *inMemory) Add(order *db.Order) error {
+func (m *InMemory) Add(order *db.Order) error {
 	if _, ok := m.store[order.OrderUID]; !ok {
 		m.store[order.OrderUID] = *order
 	} else {
@@ -28,14 +28,14 @@ func (m *inMemory) Add(order *db.Order) error {
 	return nil
 }
 
-func (m *inMemory) Get(orderUID string) (db.Order, error) {
+func (m *InMemory) Get(orderUID string) (db.Order, error) {
 	if value, ok := m.store[orderUID]; ok {
 		return value, nil
 	}
 	return db.Order{}, fmt.Errorf("there is no such key : %s", orderUID)
 }
 
-func (m *inMemory) Delete(orderUID string) error {
+func (m *InMemory) Delete(orderUID string) error {
 	if _, ok := m.store[orderUID]; !ok {
 		return fmt.Errorf("there is no such key : %s", orderUID)
 	}

@@ -3,7 +3,7 @@ package handlers
 import (
 	"L0/pkg/inmemory"
 	"github.com/julienschmidt/httprouter"
-	"log"
+	"html/template"
 	"net/http"
 )
 
@@ -12,34 +12,45 @@ type Handler interface {
 }
 
 type handler struct {
-	cash *inmemory.Cash
+	cash *inmemory.InMemory
 	//order db.Order
 }
 
-func NewHandler(cash *inmemory.Cash) Handler {
+func NewHandler(cash *inmemory.InMemory) Handler {
 	return &handler{
 		cash: cash,
 	}
 }
 
 func (h *handler) Register(router *httprouter.Router) {
-	router.GET("/", h.GetAllOrders)
-	router.GET("/user/:id", h.GetOrder)
+	router.GET("/", h.ShowPost)
+	router.GET("/uid/", h.ShowPost)
 }
 
-func (h *handler) GetAllOrders(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-	for uid := range h.cash
-	if _, err := w.Write([]byte("Get all list")); err != nil {
-		log.Fatal(err)
+//func (h *handler) GetAllOrders(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
+//	for key, _ := range *h.cash.GetStore() {
+//		if _, err := w.Write([]byte(key)); err != nil {
+//			log.Fatal(err)
+//		}
+//		w.Write([]byte("\n"))
+//	}
+//}
+//
+//func (h *handler) GetOrder(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
+//	for key, _ := range *h.cash.GetStore() {
+//		if _, err := w.Write([]byte(key)); err != nil {
+//			log.Fatal(err)
+//		}
+//		w.Write([]byte("\n"))
+//	}
+//}
+
+func (h *handler) ShowPost(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
+	tmpl, err := template.ParseFiles("ui/homePage.html")
+	if err != nil {
+		return
 	}
-}
-
-func (h *handler) GetOrder(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-
-	w.Write([]byte("Get User\n"))
-	w.Write([]byte("Get kk\n"))
-	w.Write([]byte("Get oo\n"))
-	w.Write([]byte(r.RequestURI))
+	tmpl.Execute(w, nil)
 
 }
 
