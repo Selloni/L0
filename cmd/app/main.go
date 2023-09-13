@@ -21,6 +21,8 @@ func main() {
 	router := httprouter.New()
 	log.Println("register user handler")
 
+	cash := inmemory.NewCash()
+
 	//// nats
 	sc, err := stan.Connect("test-cluster", "consumer",
 		stan.NatsURL("nats://localhost:4222"))
@@ -32,13 +34,31 @@ func main() {
 		if err = order.ReadFile(msg.Data); err != nil {
 			log.Fatal(err)
 		}
-		Run(order, router)
 		log.Println(order.OrderUID)
+		cash.Add(&order)
 	}, stan.DurableName("i-will-remember"))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer sub.Unsubscribe()
+
+	Run(order, router, &cash)
+}
+
+func Run(order db.Order, router *httprouter.Router, cash *inmemory.InMemory) {
+
+	handler := user.NewHandler(cash)
+	handler.Register(router)
+
+	psql, err := posgresql.ConnectPsql()
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = posgresql.InsertOrder(psql, &order)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	listener, ListenErr := net.Listen("tcp", fmt.Sprintf("127.0.0.1:8080"))
 	if ListenErr != nil {
 		log.Fatal(ListenErr)
@@ -52,36 +72,9 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Println("server is listening port")
+
 }
 
-func Run(order db.Order, router *httprouter.Router) {
+func FillDB() {
 
-	cash := inmemory.NewCash()
-	handler := user.NewHandler(&cash)
-	handler.Register(router)
-
-	cash.Add(&order)
-	psql, err := posgresql.ConnectPsql()
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = posgresql.InsertOrder(psql, &order)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func ConnectNATS() {
-	sc, err := stan.Connect("test-cluster", "consumer",
-		stan.NatsURL("nats://localhost:4222"))
-	if err != nil {
-		log.Printf("Expected to connect correctly, got err %v", err)
-	}
-	defer sc.Close()
-	_, err = sc.Subscribe("orders", func(msg *stan.Msg) {
-		log.Printf("Received message: %s", string(msg.Data))
-	}, stan.DurableName("i-will-remember"))
-	if err != nil {
-		log.Fatal(err)
-	}
 }
