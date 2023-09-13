@@ -2,44 +2,32 @@ package main
 
 import (
 	"L0/interal/db"
-	"flag"
 	"fmt"
 	"github.com/nats-io/stan.go"
 	"log"
+	"os"
 )
 
 func main() {
-	nats, err := ConnectNATS()
-	if err != nil {
-		log.Fatal(err)
-	}
+	myfile := os.Args[1:]
 	order := db.Order{}
-	path := flag.String("json", "order.json", "path to file json")
-	flag.Parse()
-	log.Println(*path)
-	data, err := order.OpenFile(path)
-	if err != nil {
-		log.Fatal(err)
+	for i := 0; i < len(myfile); i++ {
+		log.Printf(myfile[i])
+		data, err := order.OpenFile(&myfile[i])
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println(order.OrderUID)
+		ConnectNATS(data)
 	}
-	if err = order.ReadFile(data); err != nil {
-		log.Fatal(err)
-	}
-	nats.Publish("orders", data)
 }
 
-func ConnectNATS() (stan.Conn, error) {
-	sc, err := stan.Connect("test-cluster", "test-client",
-		stan.NatsURL("nats://localhost:4222"))
+func ConnectNATS(data []byte) {
+	sc, err := stan.Connect("test-cluster", "publisher", stan.NatsURL("nats://localhost:4222"))
 	if err != nil {
-		return nil, fmt.Errorf("Expected to connect correctly, got err %v", err)
+		fmt.Println(err)
 	}
 	defer sc.Close()
-	sub, err := sc.Subscribe("orders", func(msg *stan.Msg) {
-		log.Printf("Received message: %s", string(msg.Data))
-	}, stan.DurableName("i-will-remember"))
-	if err != nil {
-		return nil, err
-	}
-	defer sub.Unsubscribe()
-	return sc, nil
+	sc.Publish("orders", data)
+
 }

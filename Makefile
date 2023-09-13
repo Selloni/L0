@@ -4,13 +4,12 @@ run:
 	go build cmd/app/main.go
 	./main
 
-nats:
-	go run cmd/nats/nats.go
-
+nats: clean
+	go build cmd/nats/nats.go
 docker:
 	cd docker && docker compose up
 
 clean:
-	rm -rf main
+	rm -rf main nats
 	rm -rf .idea
 

@@ -5,7 +5,6 @@ import (
 	user "L0/interal/handlers"
 	"L0/pkg/inmemory"
 	"L0/pkg/posgresql"
-	"flag"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"github.com/nats-io/stan.go"
@@ -16,42 +15,30 @@ import (
 )
 
 func main() {
-	sc, _ := stan.Connect(clusterID, clientID)
-	sub, err := sc.Subscribe("foo", func(m *stan.Msg) {
-		fmt.Printf("Received a message: %s\n", string(m.Data))
-	}, stan.StartWithLastReceived()) // Receive all stored values in order
-	path := flag.String("json", "order.json", "path to file json")
-	flag.Parse()
+
+	order := db.Order{}
+
 	router := httprouter.New()
 	log.Println("register user handler")
 
-	Run(path, router)
-}
-
-func Run(path *string, router *httprouter.Router) {
-	order := db.Order{}
-	cash := inmemory.NewCash()
-	handler := user.NewHandler(&cash)
-	handler.Register(router)
-	log.Println(*path)
-	data, err := order.OpenFile(path)
+	//// nats
+	sc, err := stan.Connect("test-cluster", "consumer",
+		stan.NatsURL("nats://localhost:4222"))
+	if err != nil {
+		log.Printf("Expected to connect correctly, got err %v", err)
+	}
+	defer sc.Close()
+	sub, err := sc.Subscribe("orders", func(msg *stan.Msg) {
+		if err = order.ReadFile(msg.Data); err != nil {
+			log.Fatal(err)
+		}
+		Run(order, router)
+		log.Println(order.OrderUID)
+	}, stan.DurableName("i-will-remember"))
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err = order.ReadFile(data); err != nil {
-		log.Fatal(err)
-	}
-	log.Println(order.OrderUID)
-	cash.Add(&order)
-	psql, err := posgresql.ConnectPsql()
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = posgresql.InsertOrder(psql, &order)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	defer sub.Unsubscribe()
 	listener, ListenErr := net.Listen("tcp", fmt.Sprintf("127.0.0.1:8080"))
 	if ListenErr != nil {
 		log.Fatal(ListenErr)
@@ -65,27 +52,36 @@ func Run(path *string, router *httprouter.Router) {
 		log.Fatal(err)
 	}
 	log.Println("server is listening port")
-	//nats, err := ConnectNATS()
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//fmt.Println(nats)
-
 }
 
-func ConnectNATS() (stan.Conn, error) {
-	sc, err := stan.Connect("test-cluster", "test-client",
+func Run(order db.Order, router *httprouter.Router) {
+
+	cash := inmemory.NewCash()
+	handler := user.NewHandler(&cash)
+	handler.Register(router)
+
+	cash.Add(&order)
+	psql, err := posgresql.ConnectPsql()
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = posgresql.InsertOrder(psql, &order)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func ConnectNATS() {
+	sc, err := stan.Connect("test-cluster", "consumer",
 		stan.NatsURL("nats://localhost:4222"))
 	if err != nil {
-		return nil, fmt.Errorf("Expected to connect correctly, got err %v", err)
+		log.Printf("Expected to connect correctly, got err %v", err)
 	}
 	defer sc.Close()
-	sub, err := sc.Subscribe("orders", func(msg *stan.Msg) {
+	_, err = sc.Subscribe("orders", func(msg *stan.Msg) {
 		log.Printf("Received message: %s", string(msg.Data))
 	}, stan.DurableName("i-will-remember"))
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
-	defer sub.Unsubscribe()
-	return sc, nil
 }
