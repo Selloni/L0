@@ -16,6 +16,10 @@ import (
 )
 
 func main() {
+	sc, _ := stan.Connect(clusterID, clientID)
+	sub, err := sc.Subscribe("foo", func(m *stan.Msg) {
+		fmt.Printf("Received a message: %s\n", string(m.Data))
+	}, stan.StartWithLastReceived()) // Receive all stored values in order
 	path := flag.String("json", "order.json", "path to file json")
 	flag.Parse()
 	router := httprouter.New()

@@ -2,8 +2,10 @@ package handlers
 
 import (
 	"L0/pkg/inmemory"
+	"encoding/json"
 	"github.com/julienschmidt/httprouter"
 	"html/template"
+	"log"
 	"net/http"
 )
 
@@ -24,26 +26,8 @@ func NewHandler(cash *inmemory.InMemory) Handler {
 
 func (h *handler) Register(router *httprouter.Router) {
 	router.GET("/", h.ShowPost)
-	router.GET("/uid/", h.ShowPost)
+	router.GET("/uid/", h.ShowOrder)
 }
-
-//func (h *handler) GetAllOrders(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-//	for key, _ := range *h.cash.GetStore() {
-//		if _, err := w.Write([]byte(key)); err != nil {
-//			log.Fatal(err)
-//		}
-//		w.Write([]byte("\n"))
-//	}
-//}
-//
-//func (h *handler) GetOrder(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-//	for key, _ := range *h.cash.GetStore() {
-//		if _, err := w.Write([]byte(key)); err != nil {
-//			log.Fatal(err)
-//		}
-//		w.Write([]byte("\n"))
-//	}
-//}
 
 func (h *handler) ShowPost(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
 	tmpl, err := template.ParseFiles("ui/homePage.html")
@@ -51,11 +35,19 @@ func (h *handler) ShowPost(w http.ResponseWriter, r *http.Request, param httprou
 		return
 	}
 	tmpl.Execute(w, nil)
-
 }
 
-//// методы лежат в модели
-//func (h *handler) Register(router *httprouter.Router, o db.Order) {
-//	router.GET("/", o.GetAllOrders)
-//	router.GET("/user/:id", o.GetOrder)
-//}
+func (h *handler) ShowOrder(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
+	find := r.URL.Query().Get("UID")
+	cashMap := *h.cash.GetStore()
+	if value, ok := cashMap[find]; ok {
+		all, err := json.MarshalIndent(value, "", "\t")
+		if err != nil {
+			log.Printf("failed to wrap in json")
+		}
+		w.Write(all)
+	} else {
+		log.Printf("don't expect such a uid =  %s", find)
+		w.Write([]byte("don't expect such a uid =" + find))
+	}
+}

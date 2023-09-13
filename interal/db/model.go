@@ -69,25 +69,12 @@ func (o *Order) OpenFile(path *string) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("could not open the file, err: %v", err)
 	}
-	return data, err
+	return data, nil
 }
 
 func (o *Order) ReadFile(data []byte) error {
 	if err := json.Unmarshal(data, &o); err != nil {
-		return err
+		return fmt.Errorf("failed to write a file to the structureб %w", err)
 	}
 	return nil
 }
-
-//
-//func (o *Order) GetAllOrders(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-//	for
-//
-//	if _, err := w.Write([]byte("Get all list")); err != nil {
-//		log.Fatal(err)
-//	}
-//}
-//
-//func (o *Order) GetOrder(w http.ResponseWriter, r *http.Request, param httprouter.Params) {
-//	w.Write([]byte(o.DeliveryService))
-//}
