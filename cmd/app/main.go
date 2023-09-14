@@ -21,6 +21,7 @@ func main() {
 	cash := inmemory.NewCash()
 	psql, err := posgresql.ConnectPsql()
 	log.Println("register user handler")
+
 	//// nats
 	sc, err := stan.Connect("test-cluster", "consumer",
 		stan.NatsURL("nats://localhost:4222"))
@@ -34,9 +35,9 @@ func main() {
 		} else {
 			cash.Add(&order)
 			if err != nil {
-				log.Fatal(err)
+				log.Println(err)
 			}
-			err = posgresql.InsertOrder(psql, order)
+			err = posgresql.InsertOrder(psql, order.OrderUID, msg.Data)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -47,14 +48,11 @@ func main() {
 		log.Fatal(err)
 	}
 	defer sub.Unsubscribe()
-	//tmp, _ := cash.Get(order.OrderUID)
-	posgresql.GetOrder(psql, &order, "b563feb7b2b84b7test")
-	fmt.Println(order)
-
-	UpServer(order, router, &cash)
+	posgresql.GetOrder(psql, &cash, &order)
+	UpServer(router, &cash)
 }
 
-func UpServer(order db.Order, router *httprouter.Router, cash *inmemory.InMemory) {
+func UpServer(router *httprouter.Router, cash *inmemory.InMemory) {
 
 	handler := user.NewHandler(cash)
 	handler.Register(router)

@@ -15,10 +15,6 @@ func NewCash() InMemory {
 	}
 }
 
-func (m *InMemory) GetStore() *map[string]db.Order {
-	return &m.store
-}
-
 func (m *InMemory) Add(order *db.Order) error {
 	if _, ok := m.store[order.OrderUID]; !ok {
 		m.store[order.OrderUID] = *order
@@ -33,12 +29,4 @@ func (m *InMemory) Get(orderUID string) (db.Order, error) {
 		return value, nil
 	}
 	return db.Order{}, fmt.Errorf("there is no such key : %s", orderUID)
-}
-
-func (m *InMemory) Delete(orderUID string) error {
-	if _, ok := m.store[orderUID]; !ok {
-		return fmt.Errorf("there is no such key : %s", orderUID)
-	}
-	delete(m.store, orderUID)
-	return nil
 }
