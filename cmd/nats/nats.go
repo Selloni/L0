@@ -2,7 +2,6 @@ package main
 
 import (
 	"L0/interal/db"
-	"fmt"
 	"github.com/nats-io/stan.go"
 	"log"
 	"os"
@@ -17,7 +16,6 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Println(order.OrderUID)
 		ConnectNATS(data)
 	}
 }
@@ -25,7 +23,7 @@ func main() {
 func ConnectNATS(data []byte) {
 	sc, err := stan.Connect("test-cluster", "publisher", stan.NatsURL("nats://localhost:4222"))
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 	defer sc.Close()
 	sc.Publish("orders", data)

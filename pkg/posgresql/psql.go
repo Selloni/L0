@@ -95,3 +95,19 @@ func InsertOrder(pool *pgxpool.Pool, data *db.Order) error {
 	}
 	return nil
 }
+
+func GetOrder(pool *pgxpool.Pool, cash *db.Order, uid string) {
+	order, err := pool.Query(context.Background(), fmt.Sprintf("SELECT * FROM orders WHERE order_uid = %s", uid))
+	if err != nil {
+		log.Printf("fatal get data out BD :", err)
+	}
+	defer order.Close()
+	for order.Next() {
+		err := order.Scan(&cash.OrderUID, &cash.TrackNumber, &cash.Entry, &cash.Locale,
+			&cash.InternalSignature, &cash.CustomerID, &cash.DeliveryService,
+			&cash.Shardkey, &cash.SmID, &cash.DateCreated, &cash.OofShard)
+		if err != nil {
+			log.Print(err)
+		}
+	}
+}

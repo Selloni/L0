@@ -1,13 +1,15 @@
-.PHONY: run clean docker
+.PHONY: run clean docker nats all
+
+all: nats run
 
 run:
-	go build cmd/app/main.go
-	./main
+	go run cmd/app/main.go
 
 nats: clean
 	go build cmd/nats/nats.go
+
 docker:
-	cd docker && docker compose up
+	cd docker && docker compose up -d
 
 clean:
 	rm -rf main nats

@@ -25,7 +25,7 @@ type Order struct {
 }
 
 type Delivery struct {
-	Id      int    `json:"id"`
+	Id      int    `json:"-"`
 	Name    string `json:"name"`
 	Phone   string `json:"phone"`
 	Zip     string `json:"zip"`
@@ -36,7 +36,7 @@ type Delivery struct {
 }
 
 type Payment struct {
-	Id           int    `json:"id"`
+	Id           int    `json:"-"`
 	Transaction  string `json:"transaction"`
 	RequestID    string `json:"request_id"`
 	Currency     string `json:"currency"`
@@ -50,7 +50,7 @@ type Payment struct {
 }
 
 type Items struct {
-	Id          int    `json:"id"`
+	Id          int    `json:"-"`
 	ChrtID      int    `json:"chrt_id"`
 	TrackNumber string `json:"track_number"`
 	Price       int    `json:"price"`
@@ -74,7 +74,7 @@ func (o *Order) OpenFile(path *string) ([]byte, error) {
 
 func (o *Order) ReadFile(data []byte) error {
 	if err := json.Unmarshal(data, &o); err != nil {
-		return fmt.Errorf("failed to write a file to the structureб %w", err)
+		return fmt.Errorf("failed to write a file to the structure, %w", err)
 	}
 	return nil
 }

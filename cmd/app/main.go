@@ -17,12 +17,9 @@ import (
 func main() {
 
 	order := db.Order{}
-
 	router := httprouter.New()
-	log.Println("register user handler")
-
 	cash := inmemory.NewCash()
-
+	log.Println("register user handler")
 	//// nats
 	sc, err := stan.Connect("test-cluster", "consumer",
 		stan.NatsURL("nats://localhost:4222"))
@@ -32,10 +29,11 @@ func main() {
 	defer sc.Close()
 	sub, err := sc.Subscribe("orders", func(msg *stan.Msg) {
 		if err = order.ReadFile(msg.Data); err != nil {
-			log.Fatal(err)
+			log.Println(err)
+		} else {
+			log.Println(order.OrderUID)
+			cash.Add(&order)
 		}
-		log.Println(order.OrderUID)
-		cash.Add(&order)
 	}, stan.DurableName("i-will-remember"))
 	if err != nil {
 		log.Fatal(err)
@@ -54,6 +52,10 @@ func Run(order db.Order, router *httprouter.Router, cash *inmemory.InMemory) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	//posgresql.GetOrder(psql, &order, "b563feb7b2b84b7test")
+	//fmt.Println(order)
+
 	err = posgresql.InsertOrder(psql, &order)
 	if err != nil {
 		log.Fatal(err)
@@ -71,10 +73,6 @@ func Run(order db.Order, router *httprouter.Router, cash *inmemory.InMemory) {
 	if err := server.Serve(listener); err != nil {
 		log.Fatal(err)
 	}
-	log.Println("server is listening port")
-
-}
-
-func FillDB() {
+	log.Println("server is listening port 8080")
 
 }

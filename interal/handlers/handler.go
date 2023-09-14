@@ -15,7 +15,6 @@ type Handler interface {
 
 type handler struct {
 	cash *inmemory.InMemory
-	//order db.Order
 }
 
 func NewHandler(cash *inmemory.InMemory) Handler {
