@@ -41,7 +41,7 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			log.Println(order.OrderUID)
+			log.Printf("received via channel %s", order.OrderUID)
 		}
 	}, stan.DurableName("i-will-remember"))
 	if err != nil {
