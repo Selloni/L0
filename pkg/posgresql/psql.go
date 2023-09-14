@@ -55,7 +55,7 @@ func NewClient(ctx context.Context, con ConfigPsql) (*pgxpool.Pool, error) {
 	return pool, nil
 }
 
-func InsertOrder(pool *pgxpool.Pool, data *db.Order) error {
+func InsertOrder(pool *pgxpool.Pool, data db.Order) error {
 	conn, err := pool.Acquire(context.Background())
 	if err != nil {
 		return fmt.Errorf("failed to get connections: %v", err)
@@ -96,11 +96,35 @@ func InsertOrder(pool *pgxpool.Pool, data *db.Order) error {
 	return nil
 }
 
+func findUid(pool *pgxpool.Pool, mm map[string]db.Order) {
+
+}
+
 func GetOrder(pool *pgxpool.Pool, cash *db.Order, uid string) {
-	order, err := pool.Query(context.Background(), fmt.Sprintf("SELECT * FROM orders WHERE order_uid = %s", uid))
-	if err != nil {
-		log.Printf("fatal get data out BD :", err)
+	orderUid, _ := pool.Query(context.Background(), fmt.Sprintf("select order_uid from orders"))
+	var ids []string
+	for orderUid.Next() {
+		var id string
+		orderUid.Scan(&id)
+		ids = append(ids, id)
 	}
+	fmt.Println(ids)
+	order, err := pool.Query(context.Background(), fmt.Sprintf("SELECT * FROM orders WHERE order_uid = '%s'", uid))
+	if err != nil {
+		log.Printf("failed to get orders from the DB: %v", err)
+	}
+	//item, err := pool.Query(context.Background(), fmt.Sprintf("SELECT * FROM orders WHERE order_uid = 'b563feb7b2b84b7test'"))
+	//if err != nil {
+	//	log.Printf("failed to get orders from the DB: %v", err)
+	//}
+	//delivery, err := pool.Query(context.Background(), fmt.Sprintf("SELECT * FROM orders WHERE order_uid = 'b563feb7b2b84b7test'"))
+	//if err != nil {
+	//	log.Printf("failed to get orders from the DB: %v", err)
+	//}
+	//payment, err := pool.Query(context.Background(), fmt.Sprintf("SELECT * FROM orders WHERE order_uid = 'b563feb7b2b84b7test'"))
+	//if err != nil {
+	//	log.Printf("failed to get orders from the DB: %v", err)
+	//}
 	defer order.Close()
 	for order.Next() {
 		err := order.Scan(&cash.OrderUID, &cash.TrackNumber, &cash.Entry, &cash.Locale,

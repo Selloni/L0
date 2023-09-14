@@ -19,6 +19,7 @@ func main() {
 	order := db.Order{}
 	router := httprouter.New()
 	cash := inmemory.NewCash()
+	psql, err := posgresql.ConnectPsql()
 	log.Println("register user handler")
 	//// nats
 	sc, err := stan.Connect("test-cluster", "consumer",
@@ -31,35 +32,32 @@ func main() {
 		if err = order.ReadFile(msg.Data); err != nil {
 			log.Println(err)
 		} else {
-			log.Println(order.OrderUID)
 			cash.Add(&order)
+			if err != nil {
+				log.Fatal(err)
+			}
+			err = posgresql.InsertOrder(psql, order)
+			if err != nil {
+				log.Fatal(err)
+			}
+			log.Println(order.OrderUID)
 		}
 	}, stan.DurableName("i-will-remember"))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer sub.Unsubscribe()
+	//tmp, _ := cash.Get(order.OrderUID)
+	posgresql.GetOrder(psql, &order, "b563feb7b2b84b7test")
+	fmt.Println(order)
 
-	Run(order, router, &cash)
+	UpServer(order, router, &cash)
 }
 
-func Run(order db.Order, router *httprouter.Router, cash *inmemory.InMemory) {
+func UpServer(order db.Order, router *httprouter.Router, cash *inmemory.InMemory) {
 
 	handler := user.NewHandler(cash)
 	handler.Register(router)
-
-	psql, err := posgresql.ConnectPsql()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	//posgresql.GetOrder(psql, &order, "b563feb7b2b84b7test")
-	//fmt.Println(order)
-
-	err = posgresql.InsertOrder(psql, &order)
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	listener, ListenErr := net.Listen("tcp", fmt.Sprintf("127.0.0.1:8080"))
 	if ListenErr != nil {
@@ -74,5 +72,4 @@ func Run(order db.Order, router *httprouter.Router, cash *inmemory.InMemory) {
 		log.Fatal(err)
 	}
 	log.Println("server is listening port 8080")
-
 }
