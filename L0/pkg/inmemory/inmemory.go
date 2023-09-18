@@ -3,6 +3,7 @@ package inmemory
 import (
 	"L0/interal/db"
 	"fmt"
+	"sync"
 )
 
 type InMemory struct {
@@ -21,7 +22,10 @@ func (m *InMemory) GetStore() *map[string]db.Order {
 
 func (m *InMemory) Add(order *db.Order) error {
 	if _, ok := m.store[order.OrderUID]; !ok {
+		var mx sync.Mutex
+		mx.Lock()
 		m.store[order.OrderUID] = *order
+		mx.Unlock()
 	} else {
 		return fmt.Errorf("such a key already exists : %s", order.OrderUID)
 	}

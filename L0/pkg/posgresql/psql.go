@@ -65,6 +65,10 @@ func GetOrder(pool *pgxpool.Pool, cash *inmemory.InMemory, order *db.Order) {
 		var jsn string
 		ordUid.Scan(&jsn)
 		order.ReadFile([]byte(jsn))
+		err := cash.Add(order)
+		if err != nil {
+			log.Printf("failed to write data from the db to the cache err: %v", err)
+		}
 		log.Printf("wrote to cash uid: %s", order.OrderUID)
 	}
 

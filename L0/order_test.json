@@ -1,17 +1,17 @@
 {
   "order_uid": "b563feb7b2b84b7test",
-  "track_number": "WBILMTESTTRACK",
-  "entry": "WBIL",
+  "track_number": "TRACK",
+  "entry": "IL",
   "delivery": {
-    "name": "Test Testov",
-    "phone": "+9720000000",
-    "zip": "2639809",
-    "city": "Kiryat Mozkin",
-    "address": "Ploshad Mira 15",
-    "region": "Kraiot",
+    "name": "Ivan",
+    "phone": "+9720022001",
+    "zip": "26398099",
+    "city": "Kazan",
+    "address": "Lenina",
+    "region": "RT",
     "email": "test@gmail.com"
   },
-  "payment": {
+  "payments": {
     "transaction": "b563feb7b2b84b6test",
     "request_id": "",
     "currency": "USD",
@@ -26,7 +26,7 @@
   "items": [
     {
       "chrt_id": 9934930,
-      "track_number": "WBILMTESTTRACK",
+      "track_number": "WBIL",
       "price": 453,
       "rid": "ab4219087a764ae0btest",
       "name": "Mascaras",
@@ -39,7 +39,7 @@
     },
     {
       "chrt_id": 9934931,
-      "track_number": "WBILMTESTTRACK",
+      "track_number": "TEST",
       "price": 453,
       "rid": "ab4219087a764ae0btest",
       "name": "Mascaras",
@@ -52,7 +52,7 @@
     },
     {
       "chrt_id": 9934932,
-      "track_number": "WBILMTESTTRACK",
+      "track_number": "BI",
       "price": 453,
       "rid": "ab4219087a764ae0btest",
       "name": "Mascaras",
@@ -67,7 +67,7 @@
   "locale": "en",
   "internal_signature": "",
   "customer_id": "test",
-  "delivery_service": "meest",
+  "delivery_service": "sss",
   "shardkey": "9",
   "sm_id": 99,
   "date_created": "2021-11-26T06:22:19Z",

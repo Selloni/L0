@@ -17,7 +17,7 @@ import (
 func main() {
 
 	order := db.Order{}
-	router := httprouter.New()
+
 	cash := inmemory.NewCash()
 	psql, err := posgresql.ConnectPsql()
 	log.Println("register user handler")
@@ -39,7 +39,7 @@ func main() {
 			}
 			err = posgresql.InsertOrder(psql, order.OrderUID, msg.Data)
 			if err != nil {
-				log.Fatal(err)
+				log.Print(err)
 			}
 			log.Printf("received via channel %s", order.OrderUID)
 		}
@@ -48,12 +48,13 @@ func main() {
 		log.Fatal(err)
 	}
 	defer sub.Unsubscribe()
+
 	posgresql.GetOrder(psql, &cash, &order)
-	UpServer(router, &cash)
+	UpServer(&cash)
 }
 
-func UpServer(router *httprouter.Router, cash *inmemory.InMemory) {
-
+func UpServer(cash *inmemory.InMemory) {
+	router := httprouter.New()
 	handler := user.NewHandler(cash)
 	handler.Register(router)
 
