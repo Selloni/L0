@@ -7,22 +7,25 @@ import (
 )
 
 func main() {
-	ExampleOne()
+	nums := []int{2, 4, 6, 8, 10}
+	ExampleOne(nums)
 	fmt.Println("-----")
-	ExampleTwo()
+	ExampleTwo(nums)
+	fmt.Println("-----")
+	ExampleThree(nums)
+
 }
 
 // Сделано с помощью мьютекса,
 // обычный счетчик, который блокирует мьютекс
-func ExampleOne() {
+func ExampleOne(nums []int) {
 	var wg sync.WaitGroup
-	nums := []int{2, 4, 6, 8, 10}
 	for _, i := range nums {
-		wg.Add(1)
+		wg.Add(1) // счетчик увеличиваме на один
 		go func(i int) {
 			res := math.Pow(float64(i), 2)
 			fmt.Println(res)
-			defer wg.Done()
+			defer wg.Done() // уменьшаем на один
 		}(i)
 		wg.Wait()
 	}
@@ -33,8 +36,7 @@ func ExampleOne() {
 /////////////////////////////////////////////////////
 
 // С помощью каналов
-func ExampleTwo() {
-	nums := []int{2, 4, 6, 8, 10}
+func ExampleTwo(nums []int) {
 	ch := make(chan int)
 	go func() {
 		for _, i := range nums {
@@ -43,7 +45,7 @@ func ExampleTwo() {
 		close(ch)
 	}() // этот блок кода в горутине, выполняеться в дргуом ядре
 	for cc := range ch { // считываю с канала, пока он не будет закрыт
-		res := math.Pow(float64(cc), 2)
+		res := cc * cc
 		fmt.Println(res)
 	}
 } //
@@ -51,3 +53,17 @@ func ExampleTwo() {
 //Чтение из неинициализированного канала блокирует поток навсегда;
 //Запись в закрытый канал вызывает панику;
 //Чтение из закрытого канала даёт нулевое значение мгновенно.
+
+// буферизированный канал
+func ExampleThree(nums []int) {
+	ch := make(chan int, len(nums)) // небольшое отличие,сразу указываю количество данных могу записать
+	go func() {
+		for _, i := range nums {
+			ch <- i
+		}
+	}()
+	for i := 0; i != len(nums); i++ { // считываю данные, с размером с буфер
+		res := math.Pow(float64(<-ch), 2)
+		fmt.Println(res)
+	}
+}

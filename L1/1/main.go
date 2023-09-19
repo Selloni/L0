@@ -24,7 +24,6 @@ func (a *Action) DoIt() {
 	fmt.Printf("I'll be older next year %d\n", a.Age)
 }
 
-// Вызываю методы как от родительской структуры так и от дочерней
 func main() {
 	a := Action{
 		Human{
