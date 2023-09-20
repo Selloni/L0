@@ -39,9 +39,9 @@ func exOne(N int) {
 func worker(ctx context.Context, wg *sync.WaitGroup, input <-chan int) {
 	defer wg.Done()
 	for {
-		select {
-		case <-ctx.Done(): // завершение работы
-			return
+		select { // слушаем не пришел ли сигнал
+		//case <-ctx.Done(): // если считываем сигнал, завершаем работу
+		//	return
 		default:
 			if val, ok := <-input; ok { // считываем пока в канал поступают данные
 				time.Sleep(2 * time.Second) // для наглядности усыпляем вывод
