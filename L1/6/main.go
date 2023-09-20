@@ -5,6 +5,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 )
 
@@ -59,10 +60,25 @@ func exTwo() {
 
 }
 
-// todo сделать завершение через WaitGroup
+func exThree() { // с помощью waitgroup
+	var wg sync.WaitGroup
+	wg.Add(3) // добавляем в в счетчик 3
+	go func() {
+		for {
+			fmt.Println("WaitGroup...")
+			wg.Done() // уменьшаем счетчик
+			time.Sleep(time.Second * 2)
+		}
+
+	}()
+
+	wg.Wait() // как счетчик обнулить, программа завершиться
+	fmt.Println("Программа завершиена через WG")
+}
 
 func main() {
 	go exOne()
 	go exTwo()
+	go exThree()
 	time.Sleep(5 * time.Second)
 }

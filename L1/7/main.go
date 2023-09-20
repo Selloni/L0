@@ -45,6 +45,6 @@ func exTwo() {
 	}
 	wg.Wait()
 	for k := 1; k <= 3; k++ {
-		fmt.Println(mm.Load(k)) // выводсодержимого по ключу
+		fmt.Println(mm.Load(k)) // вывод содержимого по ключу
 	}
 }
