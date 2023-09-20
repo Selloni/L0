@@ -1,3 +1,7 @@
+// Реализовать постоянную запись данных в канал (главный поток).
+// Реализовать набор из N воркеров, которые читают произвольные данные из канала и выводят
+// в stdout. Необходима возможность выбора количества воркеров при старте.
+// Программа должна завершаться по нажатию Ctrl+C.
 package main
 
 import (
@@ -9,8 +13,6 @@ import (
 	"syscall"
 	"time"
 )
-
-// todo попросить проверить, котого поопытнее
 
 func main() {
 	fmt.Println("Напиши количество воркеров")
@@ -26,7 +28,7 @@ func exOne(N int) {
 	var wg sync.WaitGroup
 	// syscall.SIGINT - прирывания ctr c
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM) // контекст для изящного завершения
-	defer stop()
+	defer stop()                                                                             // очищает ресурсы связанные с контекстом
 	input := make(chan int)
 	for i := 1; i <= N; i++ {
 		wg.Add(1)
@@ -40,8 +42,8 @@ func worker(ctx context.Context, wg *sync.WaitGroup, input <-chan int) {
 	defer wg.Done()
 	for {
 		select { // слушаем не пришел ли сигнал
-		//case <-ctx.Done(): // если считываем сигнал, завершаем работу
-		//	return
+		case <-ctx.Done(): // если считываем сигнал, завершаем работу
+			return // если не завершить канал будет ждать ввода
 		default:
 			if val, ok := <-input; ok { // считываем пока в канал поступают данные
 				time.Sleep(2 * time.Second) // для наглядности усыпляем вывод
