@@ -1,5 +1,4 @@
 // Реализовать собственную функцию sleep.
-// todo: добавить еще реализаций
 package main
 
 import (
@@ -30,9 +29,10 @@ func SleepOne(sec time.Duration) {
 	}()
 }
 
+// работа с разницей по времени
 func SleepTwo(sec time.Duration) {
 	tt := time.Now()
-	ll := tt.Add(2 * time.Second)
-	for time.Now().Before(ll) {
+	ll := tt.Add(sec * time.Second) // получаем время в которе выходим из цикла
+	for time.Now().Before(ll) {     // сообщает, находится ли перед нами момент времени
 	}
 }
