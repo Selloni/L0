@@ -9,7 +9,7 @@ func main() {
 }
 
 func delete(alf []string, i int) (tmp []string) {
-	tmp = alf[:i]
-	tmp = append(tmp, alf[i+1:]...)
+	tmp = alf[:i]                   // сохраняет числа до i элемента
+	tmp = append(tmp, alf[i+1:]...) // добавляем данные после i элемента
 	return
 }

@@ -12,9 +12,6 @@ import (
 // скрывая всю работу от пользователя
 
 // внешний сервис, для работы с xml, который работает только с xml
-type Analytical interface {
-	SendXml(bb []byte) interface{}
-}
 
 type XmlDock struct {
 	Name string ` xml:"name"`
