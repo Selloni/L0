@@ -22,6 +22,7 @@ type XmlDock struct {
 }
 
 func (doc XmlDock) SendXml(bb []byte) {
+	// logic
 	fmt.Println(string(bb))
 }
 
@@ -40,7 +41,6 @@ func (doc JsonDock) ConvertToXml(path string) { // конвертируем в x
 		fmt.Println(err)
 	}
 	json.Unmarshal(file, &doc)
-	fmt.Println(doc)
 	bytes, err := xml.Marshal(doc)
 	if err != nil {
 		fmt.Println(err)
@@ -50,7 +50,7 @@ func (doc JsonDock) ConvertToXml(path string) { // конвертируем в x
 }
 
 type JsonDockAdapter struct { // адаптер
-	jsD *JsonDock
+	jsD JsonDock
 }
 
 // сервисы между собой не связанны
