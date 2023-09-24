@@ -24,6 +24,10 @@ func (a *Action) DoIt() {
 	fmt.Printf("I'll be older next year %d\n", a.Age)
 }
 
+//func (a *Action) Say() { \\ переопределение
+//	fmt.Printf("test\n")
+//}
+
 func main() {
 	a := Action{
 		Human{
@@ -31,6 +35,7 @@ func main() {
 			Age:  24,
 		},
 	}
-	a.Say()
+	a.Say() // вызывем метод родителя
 	a.DoIt()
+
 }

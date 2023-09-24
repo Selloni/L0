@@ -15,7 +15,7 @@ func main() {
 }
 
 func checkOne(str string) bool {
-	mm := make(map[int32]bool)
+	mm := make(map[int32]bool) // проверяем по ascii
 	for _, i := range str {
 		if mm[i] == true { // если символ уже был
 			return false
@@ -34,7 +34,7 @@ func checkTwo(str string) bool {
 		if _, ok := mm[char]; ok {
 			return false
 		}
-		mm[char] = struct{}{} // используем структуру, потому что она ни чегоне весит
+		mm[char] = struct{}{} // используем структуру,  она ничего не весит
 	}
 	return true
 }
