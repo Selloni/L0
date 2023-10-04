@@ -1,6 +1,8 @@
 package inmemory
 
-import "L0/interal/db"
+import (
+	"L0/L0/interal/db"
+)
 
 type Cash interface {
 	Add(order *db.Order) error

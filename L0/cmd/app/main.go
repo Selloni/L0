@@ -1,13 +1,12 @@
 package main
 
 import (
-	"L0/interal/db"
-	user "L0/interal/handlers"
+	"L0/L0/interal/db"
+	user "L0/L0/interal/handlers"
 	"L0/pkg/inmemory"
 	"L0/pkg/posgresql"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
-	"github.com/nats-io/stan.go"
 	"log"
 	"net"
 	"net/http"
