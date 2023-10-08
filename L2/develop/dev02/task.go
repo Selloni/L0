@@ -48,11 +48,10 @@ func Parsing(str []rune) {
 		} else if unicode.IsDigit(str[i]) {
 			n, _ = strconv.Atoi(string(str[i]))
 			fmt.Println(n)
-			for ; n > 0; n-- {
+			for ; n > 1; n-- {
 				buff = append(buff, tmp)
 			}
 		}
-
 	}
 	fmt.Println(string(buff))
 }
