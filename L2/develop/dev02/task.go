@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"unicode"
@@ -15,7 +16,7 @@ import (
 	- "abcd" => "abcd"
 	- "45" => "" (некорректная строка)
 	- "" => ""
-Дополнительное задание: поддержка escape - последовательностей
+TODO:Дополнительное задание: поддержка escape - последовательностей
 	- qwe\4\5 => qwe45 (*)
 	- qwe\45 => qwe44444 (*)
 	- qwe\\5 => qwe\\\\\ (*)
@@ -33,25 +34,38 @@ func main() {
 	fmt.Println("напиши последовательность")
 	fmt.Fscan(os.Stdin, &tmp)
 	str = []rune(tmp)
-	Parsing(str)
-	//fmt.Println(str)
+	buff, err := Parsing(str)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(string(buff))
 }
 
-func Parsing(str []rune) {
+func Parsing(str []rune) ([]rune, error) {
 	buff := make([]rune, len(str))
-	var tmp rune
+	var (
+		tmp    rune
+		err    error
+		letter bool // проверка что буква встречаеться
+	)
 	for i := 0; i < len(str); i++ {
 		n := 1
 		if unicode.IsLetter(str[i]) {
-			tmp = str[i]
+			letter = true
+			tmp = str[i] // сохраняем в переменную
 			buff = append(buff, tmp)
 		} else if unicode.IsDigit(str[i]) {
-			n, _ = strconv.Atoi(string(str[i]))
-			fmt.Println(n)
-			for ; n > 1; n-- {
-				buff = append(buff, tmp)
+			if !letter {
+				return nil, fmt.Errorf("не коректный ввод")
+			}
+			n, err = strconv.Atoi(string(str[i])) // переводим в привычный вид сроку, после в число,для цикда
+			if err != nil {
+				return nil, err
+			}
+			for ; n > 1; n-- { // изначально буква уже добавлена
+				buff = append(buff, tmp) // добавляем в список количество
 			}
 		}
 	}
-	fmt.Println(string(buff))
+	return buff, nil
 }
