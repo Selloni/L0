@@ -1,5 +1,12 @@
 package main
 
+import (
+	"fmt"
+	"os"
+	"strconv"
+	"unicode"
+)
+
 /*
 === Задача на распаковку ===
 
@@ -19,5 +26,33 @@ package main
 */
 
 func main() {
+	var (
+		tmp string
+		str []rune
+	)
+	fmt.Println("напиши последовательность")
+	fmt.Fscan(os.Stdin, &tmp)
+	str = []rune(tmp)
+	Parsing(str)
+	//fmt.Println(str)
+}
 
+func Parsing(str []rune) {
+	buff := make([]rune, len(str))
+	var tmp rune
+	for i := 0; i < len(str); i++ {
+		n := 1
+		if unicode.IsLetter(str[i]) {
+			tmp = str[i]
+			buff = append(buff, tmp)
+		} else if unicode.IsDigit(str[i]) {
+			n, _ = strconv.Atoi(string(str[i]))
+			fmt.Println(n)
+			for ; n > 0; n-- {
+				buff = append(buff, tmp)
+			}
+		}
+
+	}
+	fmt.Println(string(buff))
 }
