@@ -42,7 +42,7 @@ func main() {
 }
 
 func Parsing(str []rune) ([]rune, error) {
-	buff := make([]rune, len(str))
+	var buff []rune
 	var (
 		tmp    rune
 		err    error
