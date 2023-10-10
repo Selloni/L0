@@ -57,7 +57,7 @@ func main() {
 		sort.Sort(sort.Reverse(sort.StringSlice(list)))
 	}
 	if *ff.k != 0 {
-		SortOnIndex(list, *ff.k)
+		SortOnIndex(list, *ff.k-1)
 	}
 	if *ff.u {
 		list = DeleteDuplicates(list)
@@ -100,7 +100,13 @@ func SortOnIndex(list []string, num int) {
 	sort.Slice(list, func(i, j int) bool {
 		tmp1 := strings.Split(list[i], " ")
 		tmp2 := strings.Split(list[j], " ")
-		return tmp1[num] < tmp2[num]
+		if num >= len(tmp1) {
+			return true
+		}
+		if num < len(tmp2) {
+			return tmp1[num] < tmp2[num]
+		}
+		return false
 	})
 }
 

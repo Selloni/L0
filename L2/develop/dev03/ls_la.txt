@@ -1,0 +1,10 @@
+drwxr-xr-x  10 grandpat  4222      340 Oct 10 18:22 .
+drwxr-xr-x  13 grandpat  4222      442 Oct  3 12:43 ..
+-rwxr-xr-x   1 grandpat  4222  2120976 Oct 10 18:22 dev03
+-rw-r--r--   1 grandpat  4222      137 Oct 10 18:22 devSort.txt
+-rw-r--r--   1 grandpat  4222       22 Oct  9 12:43 go.mod
+-rw-r--r--   1 grandpat  4222      137 Oct 10 18:22 sort.txt
+-rw-r--r--   1 grandpat  4222     3394 Oct 10 18:21 task.go
+-rw-r--r--   1 grandpat  4222      138 Oct  9 17:02 task_test.go
+-rw-r--r--   1 grandpat  4222      616 Oct 10 13:22 test.sh
+-rw-r--r--   1 grandpat  4222      136 Oct 10 18:11 text.txt

@@ -23,9 +23,9 @@ sort -u text.txt > sort.txt
 diff -s devSort.txt sort.txt
 rm sort.txt devSort.txt
 
-./dev03 -k 2 text.txt > devSort.txt
-sort -k 2 text.txt > sort.txt
+./dev03 -k 2 ls_la.txt > devSort.txt
+sort -k 2 ls_la.txt > sort.txt
 diff -s devSort.txt sort.txt
-#rm sort.txt devSort.txt
+rm sort.txt devSort.txt
 
 
