@@ -25,11 +25,15 @@ import (
 */
 
 func main() {
-	ss := []string{"пятак", "пятка", "тяпка", "тяпка", "терка", "терк", "листок", "слиток", "столик", "лист", "литс"}
+	ss := []string{"пятак", "пятка", "тяПка", "тяпка", "тЕрка", "терк", "Листок", "сЛИток", "столик", "лист", "литс"}
 	fmt.Println(findAnagramme(ss))
 }
 
-func findAnagramme(buff []string) map[string][]string {
+func findAnagramme(tmp []string) map[string][]string {
+	buff := make([]string, len(tmp))
+	for i := range tmp {
+		buff[i] = tmp[i]
+	}
 	countAscii := make(map[string]int32)
 	for world, _ := range buff {
 		_, ok := countAscii[buff[world]]
