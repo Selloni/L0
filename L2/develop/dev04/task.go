@@ -30,9 +30,9 @@ func main() {
 }
 
 func findAnagramme(tmp []string) map[string][]string {
-	buff := make([]string, len(tmp))
+	buff := make([]string, len(tmp)) // забыл про нижний регист, грубое решение
 	for i := range tmp {
-		buff[i] = tmp[i]
+		buff[i] = strings.ToLower(tmp[i])
 	}
 	countAscii := make(map[string]int32)
 	for world, _ := range buff {
@@ -58,15 +58,16 @@ func fillMyMap(countAscii map[string]int32, buff []string) map[string][]string {
 		var asciiNum int32
 		_, ok := myMap[buff[i]]
 		if !ok {
-			myMap[strings.ToUpper(buff[i])] = []string{}
+			myMap[(buff[i])] = []string{}
 			asciiNum = countAscii[buff[i]]
 			delete(countAscii, buff[i])
 		}
 		for k, v := range countAscii {
 			if asciiNum == v {
-				myMap[buff[i]] = append(myMap[buff[i]], strings.ToUpper(k))
+				myMap[buff[i]] = append(myMap[buff[i]], k)
 				delete(countAscii, k)
 			}
+
 		}
 	}
 	return myMap
