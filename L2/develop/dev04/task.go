@@ -1,5 +1,10 @@
 package main
 
+import (
+	"fmt"
+	"strings"
+)
+
 /*
 === Поиск анаграмм по словарю ===
 
@@ -20,5 +25,45 @@ package main
 */
 
 func main() {
+	ss := []string{"пятак", "пятка", "тяпка", "тяпка", "терка", "терк", "листок", "слиток", "столик", "лист", "литс"}
+	fmt.Println(findAnagramme(ss))
+}
 
+func findAnagramme(buff []string) map[string][]string {
+	countAscii := make(map[string]int32)
+	for world, _ := range buff {
+		_, ok := countAscii[buff[world]]
+		if !ok {
+			for _, i := range buff[world] {
+				countAscii[buff[world]] += i
+			}
+		}
+	}
+	allMap := fillMyMap(countAscii, buff)
+	for k, _ := range allMap {
+		if len(allMap[k]) < 2 {
+			delete(allMap, k)
+		}
+	}
+	return allMap
+}
+
+func fillMyMap(countAscii map[string]int32, buff []string) map[string][]string {
+	myMap := make(map[string][]string)
+	for i, _ := range buff {
+		var asciiNum int32
+		_, ok := myMap[buff[i]]
+		if !ok {
+			myMap[strings.ToUpper(buff[i])] = []string{}
+			asciiNum = countAscii[buff[i]]
+			delete(countAscii, buff[i])
+		}
+		for k, v := range countAscii {
+			if asciiNum == v {
+				myMap[buff[i]] = append(myMap[buff[i]], strings.ToUpper(k))
+				delete(countAscii, k)
+			}
+		}
+	}
+	return myMap
 }
