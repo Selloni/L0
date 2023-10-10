@@ -16,6 +16,6 @@ rm sort.txt devSort.txt
 ./dev03 -n text.txt > devSort.txt
 sort -n text.txt > sort.txt
 diff -s devSort.txt sort.txt
-rm sort.txt devSort.txt
+#rm sort.txt devSort.txt
 
 

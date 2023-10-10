@@ -50,7 +50,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	sort.Strings(list)
 	//if *ff.n {
 	//	sortNum(list)
 	//}
@@ -72,25 +71,36 @@ func ReadFile(fileName string, ff *flags) (buff []string, err error) {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
-		if *ff.n {
-			//isNum := sortNum(line)
-			//if isNum {
-			//	numBuff = append(numBuff, line)
-			//	continue
-			//}
+		if *ff.n && sortNum(line) {
+			numBuff = append(numBuff, line)
+			continue
+		} else {
 			buff = append(buff, line)
 		}
 	}
 	if err := scanner.Err(); err != nil {
 		return nil, err
 	}
+	sort.Strings(buff)
 	if *ff.n {
+		sort.Strings(numBuff)
+		fmt.Println(numBuff)
 		buff = append(buff, numBuff...)
 	}
 	return buff, nil
 }
 
 func sortNum(lines string) bool {
-	tmp := rune(lines[0])
-	return unicode.IsDigit(tmp)
+	if len(lines) > 0 {
+		tmp := rune(lines[0])
+		return unicode.IsDigit(tmp)
+	}
+	return false
 }
+
+//func sortNum(data[]string) []string  {
+//	sort.Slice(data, func(i, j int) bool {
+//		return data[i] > data[j]
+//	})
+//	return data
+//}
