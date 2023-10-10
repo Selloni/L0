@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"sort"
+	"strings"
 	"unicode"
 )
 
@@ -35,34 +36,40 @@ todo:Поддержать ключи
 */
 
 type flags struct {
-	k, n, r, u *bool
+	n, r, u *bool
+	k       *int
 }
 
 func main() {
 	ff := flags{}
-	ff.k = flag.Bool("k", false, "указание колонки для сортировки")
+	ff.k = flag.Int("k", 0, "указание колонки для сортировки")
 	ff.n = flag.Bool("n", false, "сортировать по числовому значению")
 	ff.r = flag.Bool("r", false, "сортировать в обратном порядке")
 	ff.u = flag.Bool("u", false, "не выводить повторяющиеся строки")
 	flag.Parse()
+
 	fileName := os.Args[len(os.Args)-1]
 	list, err := ReadFile(fileName, &ff)
 	if err != nil {
 		log.Fatal(err)
 	}
-	//if *ff.n {
-	//	sortNum(list)
-	//}
 	if *ff.r {
 		sort.Sort(sort.Reverse(sort.StringSlice(list)))
+	}
+	if *ff.k != 0 {
+		SortOnIndex(list, *ff.k)
+	}
+	if *ff.u {
+		list = DeleteDuplicates(list)
 	}
 	for _, i := range list {
 		fmt.Println(i)
 	}
 }
 
-func ReadFile(fileName string, ff *flags) (buff []string, err error) {
-	var numBuff []string
+func ReadFile(fileName string, ff *flags) ([]string, error) {
+	var buff, numBuff []string
+
 	file, err := os.Open(fileName)
 	if err != nil {
 		return nil, err
@@ -84,10 +91,17 @@ func ReadFile(fileName string, ff *flags) (buff []string, err error) {
 	sort.Strings(buff)
 	if *ff.n {
 		sort.Strings(numBuff)
-		fmt.Println(numBuff)
 		buff = append(buff, numBuff...)
 	}
 	return buff, nil
+}
+
+func SortOnIndex(list []string, num int) {
+	sort.Slice(list, func(i, j int) bool {
+		tmp1 := strings.Split(list[i], " ")
+		tmp2 := strings.Split(list[j], " ")
+		return tmp1[num] < tmp2[num]
+	})
 }
 
 func sortNum(lines string) bool {
@@ -98,9 +112,21 @@ func sortNum(lines string) bool {
 	return false
 }
 
-//func sortNum(data[]string) []string  {
-//	sort.Slice(data, func(i, j int) bool {
-//		return data[i] > data[j]
-//	})
-//	return data
-//}
+func DeleteDuplicates(line []string) []string {
+	newLine := make([]string, 0)
+	for i := 0; i < len(line); i++ {
+		if elemExists(newLine, line[i]) == false {
+			newLine = append(newLine, line[i])
+		}
+	}
+	return newLine
+}
+
+func elemExists(newLine []string, elem string) bool {
+	for _, v := range newLine {
+		if v == elem {
+			return true
+		}
+	}
+	return false
+}
