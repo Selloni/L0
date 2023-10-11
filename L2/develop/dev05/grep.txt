@@ -39,7 +39,7 @@ func main() {
 	ParsFlag(&fl)
 
 	files := flag.Args()
-	out, err := ReadFile(files[1:], fl)
+	out, err := ReadFile(files[1], fl)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -60,26 +60,23 @@ func ParsFlag(fl *flags) {
 
 }
 
-func ReadFile(files []string, fl flags) ([]string, error) {
+func ReadFile(path string, fl flags) ([]string, error) {
 	outStr := make([]string, 0)
-	for _, path := range files {
-		file, err := os.Open(path)
-		if err != nil {
-			return nil, err
-		}
-		defer file.Close()
-		pattern, err := regexp.Compile(os.Args[1])
-		if err != nil {
-			return nil, err
-		}
-		scan := bufio.NewScanner(file)
-		for scan.Scan() {
-
-			if pattern.MatchString(scan.Text()) && !*fl.v {
-				outStr = append(outStr, scan.Text())
-			} else if *fl.v {
-				outStr = append(outStr, scan.Text())
-			}
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	pattern, err := regexp.Compile(os.Args[1])
+	if err != nil {
+		return nil, err
+	}
+	scan := bufio.NewScanner(file)
+	for scan.Scan() {
+		if pattern.MatchString(scan.Text()) && !*fl.v {
+			outStr = append(outStr, scan.Text())
+		} else if !pattern.MatchString(scan.Text()) && *fl.v {
+			//outStr = append(outStr, scan.Text())
 		}
 	}
 	return outStr, nil

@@ -43,12 +43,13 @@ func main() {
 	ParsFlag(&fl)
 
 	files := flag.Args()
-	out, err := ReadFile(files[1:], fl)
+	if len(files) < 1 {
+		log.Fatal("ожидаю файл")
+	}
+	out, err := ReadFile(files[len(files)-1], fl)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(*fl.v)
-	//fmt.Printf("%v:", files[1])
 	for _, i := range out {
 		fmt.Println(i)
 	}
@@ -67,25 +68,29 @@ func ParsFlag(fl *flags) {
 
 }
 
-func ReadFile(files []string, fl flags) ([]string, error) {
+func ReadFile(path string, fl flags) ([]string, error) {
+	var pattern *regexp.Regexp
+	var err error
 	outStr := make([]string, 0)
-	for _, path := range files {
-		file, err := os.Open(path)
-		if err != nil {
-			return nil, err
-		}
-		defer file.Close()
-		pattern, err := regexp.Compile(os.Args[1])
-		if err != nil {
-			return nil, err
-		}
-		scan := bufio.NewScanner(file)
-		for scan.Scan() {
-			if pattern.MatchString(scan.Text()) && !*fl.v {
-				outStr = append(outStr, scan.Text())
-			} else if *fl.v {
-				outStr = append(outStr, scan.Text())
-			}
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	if *fl.i {
+		pattern, err = regexp.Compile("(?i)" + os.Args[1])
+	} else {
+		pattern, err = regexp.Compile(os.Args[1])
+	}
+	if err != nil {
+		return nil, err
+	}
+	scan := bufio.NewScanner(file)
+	for scan.Scan() {
+		if pattern.MatchString(scan.Text()) && !*fl.v {
+			outStr = append(outStr, scan.Text())
+		} else if !pattern.MatchString(scan.Text()) && *fl.v {
+			//outStr = append(outStr, scan.Text())
 		}
 	}
 	return outStr, nil
