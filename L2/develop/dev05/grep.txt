@@ -24,13 +24,9 @@ import (
 -F - "fixed", точное совпадение со строкой, не паттерн
 -n - "line num", печатать номер строки
 
-Программа должна проходить все тесты. Код должен проходить проверки go vet и golint.
 */
 
 type flags struct {
-	A *int
-	B *int
-	C *int
 	c *bool
 	i *bool
 	v *bool
@@ -47,10 +43,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(*fl.v)
-	//fmt.Printf("%v:", files[1])
 	for _, i := range out {
-		fmt.Println(i)
 	}
 }
 
@@ -81,6 +74,7 @@ func ReadFile(files []string, fl flags) ([]string, error) {
 		}
 		scan := bufio.NewScanner(file)
 		for scan.Scan() {
+
 			if pattern.MatchString(scan.Text()) && !*fl.v {
 				outStr = append(outStr, scan.Text())
 			} else if *fl.v {
