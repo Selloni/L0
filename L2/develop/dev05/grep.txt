@@ -74,7 +74,6 @@ func ReadFile(files []string, fl flags) ([]string, error) {
 		}
 		scan := bufio.NewScanner(file)
 		for scan.Scan() {
-
 			if pattern.MatchString(scan.Text()) && !*fl.v {
 				outStr = append(outStr, scan.Text())
 			} else if *fl.v {

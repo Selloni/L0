@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"regexp"
 )
@@ -43,15 +44,12 @@ func main() {
 	ParsFlag(&fl)
 
 	files := flag.Args()
-	out, err := ReadFile(files[1:], fl)
+	out, err := ReadFile(files, fl)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(*fl.v)
-	//fmt.Printf("%v:", files[1])
-	for _, i := range out {
-		fmt.Println(i)
-	}
+	Output(out, fl)
+
 }
 
 func ParsFlag(fl *flags) {
@@ -67,26 +65,51 @@ func ParsFlag(fl *flags) {
 
 }
 
-func ReadFile(files []string, fl flags) ([]string, error) {
+func ReadFile(strIn []string, fl flags) ([]string, error) {
 	outStr := make([]string, 0)
-	for _, path := range files {
+	flagBC := math.Max(float64(*fl.C), float64(*fl.B))
+
+	buffStr := make([]string, 3, 3)
+	for _, path := range strIn[1:] {
+		NumLine := 1
 		file, err := os.Open(path)
 		if err != nil {
 			return nil, err
 		}
 		defer file.Close()
-		pattern, err := regexp.Compile(os.Args[1])
+		pattern, err := regexp.Compile(strIn[0])
 		if err != nil {
 			return nil, err
 		}
 		scan := bufio.NewScanner(file)
+
 		for scan.Scan() {
-			if pattern.MatchString(scan.Text()) && !*fl.v {
+			NumLine++
+			find := pattern.MatchString(scan.Text())
+			if !find && flagBC > 0 {
+				//fmt.Println(NumLine % int(flagBC))
+				buffStr[NumLine%int(flagBC)] = scan.Text()
+				//fmt.Println(buffStr)
+			}
+			if find && !*fl.v {
+				if flagBC > 0 {
+					outStr = append(outStr, buffStr...)
+				}
 				outStr = append(outStr, scan.Text())
-			} else if *fl.v {
+			} else if !find && *fl.v {
 				outStr = append(outStr, scan.Text())
 			}
 		}
 	}
 	return outStr, nil
+}
+
+func Output(out []string, fl flags) {
+	if *fl.c {
+		fmt.Println(len(out))
+	} else {
+		for _, i := range out {
+			fmt.Println(i)
+		}
+	}
 }
