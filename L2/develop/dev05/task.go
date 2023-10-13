@@ -8,6 +8,7 @@ import (
 	"math"
 	"os"
 	"regexp"
+	"strconv"
 )
 
 /*
@@ -67,39 +68,55 @@ func ParsFlag(fl *flags) {
 
 func ReadFile(strIn []string, fl flags) ([]string, error) {
 	outStr := make([]string, 0)
-	var fullFile []string
+	var (
+		fullFile []string
+	)
 	flagBC := math.Max(float64(*fl.C), float64(*fl.B))
 	flagAC := math.Max(float64(*fl.C), float64(*fl.A))
+	flagI, flagN := "", ""
+	if *fl.i {
+		flagI = "(?i)"
+	}
 	for _, path := range strIn[1:] {
 		NumLine := 1
+
 		file, err := os.Open(path)
 		if err != nil {
 			return nil, err
 		}
 		defer file.Close()
-		pattern, err := regexp.Compile(strIn[0])
+		pattern, err := regexp.Compile(flagI + strIn[0])
 		if err != nil {
 			return nil, err
 		}
 		scan := bufio.NewScanner(file)
 		for scan.Scan() {
+			if *fl.n {
+				flagN = (strconv.Itoa(NumLine) + ":")
+			}
+			find := pattern.MatchString(scan.Text())
 			if flagBC > 0 {
 				fullFile = append(fullFile, scan.Text())
 			}
-			find := pattern.MatchString(scan.Text())
 			if find && !*fl.v {
 				if flagBC > 0 {
 					outStr = append(outStr, appendBefore(fullFile, int(flagBC), NumLine)...)
 				}
+				outStr = append(outStr, flagN+scan.Text())
 				if flagAC > 0 {
-					outStr = append(outStr, scan.Text())
 					outStr = append(outStr, appendAfter(scan, int(flagAC))...)
 				}
-			} else if !find && *fl.v && (flagBC+flagAC) == 0 {
-				outStr = append(outStr, scan.Text())
+				if flagAC+flagBC > 0 {
+					outStr = append(outStr, "--")
+				}
+			} else if !find && *fl.v {
+				outStr = append(outStr, flagN+scan.Text())
 			}
 			NumLine++
 		}
+	}
+	if flagAC+flagBC > 0 { // костыль
+		outStr = outStr[:len(outStr)-1]
 	}
 	return outStr, nil
 }
@@ -116,12 +133,11 @@ func Output(out []string, fl flags) {
 
 func appendBefore(fullFile []string, countBefore int, numLine int) []string {
 	var tmp []string
-	for i := countBefore + 1; i > 0; i-- {
+	for i := countBefore + 1; i > 1; i-- {
 		if numLine-i > -1 {
 			tmp = append(tmp, fullFile[numLine-i])
 		}
 	}
-	tmp = append(tmp, "--")
 	return tmp
 }
 
@@ -132,7 +148,6 @@ func appendAfter(scan *bufio.Scanner, flagAC int) []string {
 			tmp = append(tmp, scan.Text())
 			flagAC--
 			if flagAC == 0 {
-				tmp = append(tmp, "--")
 				break
 			}
 		}
