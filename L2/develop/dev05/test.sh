@@ -56,5 +56,9 @@ diff -s s21_grep.txt grep.txt
 grep -n  int task.go  > grep.txt
 diff -s s21_grep.txt grep.txt
 
-#rm s21_grep.txt grep.txt
+./dev06 -F } task.go > s21_grep.txt
+grep -F  } task.go  > grep.txt
+diff -s s21_grep.txt grep.txt
+
+rm s21_grep.txt grep.txt
 rm -rf dev06

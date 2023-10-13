@@ -78,14 +78,18 @@ func ReadFile(strIn []string, fl flags) ([]string, error) {
 		flagI = "(?i)"
 	}
 	for _, path := range strIn[1:] {
+		regx := strIn[0]
 		NumLine := 1
-
 		file, err := os.Open(path)
 		if err != nil {
 			return nil, err
 		}
 		defer file.Close()
-		pattern, err := regexp.Compile(flagI + strIn[0])
+		if *fl.F {
+			regx = regexp.QuoteMeta(regx)
+		}
+		pattern, err := regexp.Compile(flagI + regx)
+
 		if err != nil {
 			return nil, err
 		}
