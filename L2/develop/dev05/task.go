@@ -67,9 +67,9 @@ func ParsFlag(fl *flags) {
 
 func ReadFile(strIn []string, fl flags) ([]string, error) {
 	outStr := make([]string, 0)
+	var fullFile []string
 	flagBC := math.Max(float64(*fl.C), float64(*fl.B))
-
-	buffStr := make([]string, 3, 3)
+	flagAC := math.Max(float64(*fl.C), float64(*fl.A))
 	for _, path := range strIn[1:] {
 		NumLine := 1
 		file, err := os.Open(path)
@@ -82,23 +82,20 @@ func ReadFile(strIn []string, fl flags) ([]string, error) {
 			return nil, err
 		}
 		scan := bufio.NewScanner(file)
-
 		for scan.Scan() {
-			NumLine++
 			find := pattern.MatchString(scan.Text())
-			if !find && flagBC > 0 {
-				//fmt.Println(NumLine % int(flagBC))
-				buffStr[NumLine%int(flagBC)] = scan.Text()
-				//fmt.Println(buffStr)
-			}
 			if find && !*fl.v {
 				if flagBC > 0 {
-					outStr = append(outStr, buffStr...)
+					outStr = append(outStr, appendBefore(fullFile, int(flagBC), NumLine)...)
 				}
-				outStr = append(outStr, scan.Text())
-			} else if !find && *fl.v {
+				if flagAC > 0 {
+					outStr = append(outStr, scan.Text())
+					outStr = append(outStr, appendAfter(scan, int(flagAC))...)
+				}
+			} else if !find && *fl.v && (flagBC+flagAC) == 0 {
 				outStr = append(outStr, scan.Text())
 			}
+			NumLine++
 		}
 	}
 	return outStr, nil
@@ -112,4 +109,30 @@ func Output(out []string, fl flags) {
 			fmt.Println(i)
 		}
 	}
+}
+
+func appendBefore(fullFile []string, countBefore int, numLine int) []string {
+	var tmp []string
+	for i := countBefore + 1; i > 0; i-- {
+		if numLine-i > -1 {
+			tmp = append(tmp, fullFile[numLine-i])
+		}
+	}
+	tmp = append(tmp, "--")
+	return tmp
+}
+
+func appendAfter(scan *bufio.Scanner, flagAC int) []string {
+	var tmp []string
+	for scan.Scan() {
+		if flagAC != 0 {
+			tmp = append(tmp, scan.Text())
+			flagAC--
+			if flagAC == 0 {
+				tmp = append(tmp, "--")
+				break
+			}
+		}
+	}
+	return tmp
 }
