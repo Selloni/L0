@@ -83,6 +83,9 @@ func ReadFile(strIn []string, fl flags) ([]string, error) {
 		}
 		scan := bufio.NewScanner(file)
 		for scan.Scan() {
+			if flagBC > 0 {
+				fullFile = append(fullFile, scan.Text())
+			}
 			find := pattern.MatchString(scan.Text())
 			if find && !*fl.v {
 				if flagBC > 0 {
