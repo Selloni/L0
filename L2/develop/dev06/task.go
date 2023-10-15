@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"strings"
 )
 
@@ -20,9 +21,9 @@ import (
 */
 
 type flags struct {
-	f *int
-	d *string
-	s *bool
+	f int
+	d string
+	s bool
 }
 
 type Args struct {
@@ -32,42 +33,45 @@ type Args struct {
 
 func main() {
 	argc := getArgc()
-	output := readString(*argc)
+	output, err := readString(argc)
+	if err != nil {
+		log.Fatalln(err)
+	}
 	for _, str := range output {
 		fmt.Println(str)
 	}
 }
 
-func readString(argc Args) []string {
+func readString(argc *Args) ([]string, error) {
 	var output []string
+	if argc.fl.f == 0 {
+		return nil, fmt.Errorf("вы должны задать список полей")
+	}
 	for _, str := range argc.str {
-		isSplit := strings.Contains(str, *argc.fl.d)
-		arr := strings.Split(str, *argc.fl.d)
+		isSplit := strings.Contains(str, argc.fl.d)
+		arr := strings.Split(str, argc.fl.d)
 		if isSplit {
-			if len(arr) > *argc.fl.f-1 {
-				output = append(output, arr[*argc.fl.f-1])
+			if len(arr) > argc.fl.f-1 {
+				output = append(output, arr[argc.fl.f-1])
 			}
-		} else if !(*argc.fl.s) {
+		} else if !(argc.fl.s) {
 			output = append(output, str)
 		}
 	}
-	return output
-}
-
-func parsFlag(fl *flags) {
-	fl.f = flag.Int("f", 0, "fields - выбрать поля (колонки)")
-	fl.d = flag.String("d", "	", "delimiter - использовать другой разделитель")
-	fl.s = flag.Bool("s", false, "separated - только строки с разделителем")
-	flag.Parse()
+	return output, nil
 }
 
 func getArgc() *Args {
-	var fl flags
-	parsFlag(&fl)
-
+	ff := flag.Int("f", 0, "fields - выбрать поля (колонки)")
+	fd := flag.String("d", "\t", "delimiter - использовать другой разделитель")
+	fs := flag.Bool("s", false, "separated - только строки с разделителем")
+	flag.Parse()
 	return &Args{
-		fl:  fl,
+		fl: flags{
+			*ff,
+			*fd,
+			*fs,
+		},
 		str: flag.Args(), // передаю все строки после команды и флагов
-
 	}
 }
