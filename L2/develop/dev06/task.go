@@ -32,14 +32,24 @@ type Args struct {
 
 func main() {
 	argc := getArgc()
-	fmt.Print(readString(*argc))
+	output := readString(*argc)
+	for _, str := range output {
+		fmt.Println(str)
+	}
 }
 
 func readString(argc Args) []string {
 	var output []string
 	for _, str := range argc.str {
+		isSplit := strings.Contains(str, *argc.fl.d)
 		arr := strings.Split(str, *argc.fl.d)
-		output = append(output, arr[*argc.fl.f-1])
+		if isSplit {
+			if len(arr) > *argc.fl.f-1 {
+				output = append(output, arr[*argc.fl.f-1])
+			}
+		} else if !(*argc.fl.s) {
+			output = append(output, str)
+		}
 	}
 	return output
 }
@@ -47,7 +57,7 @@ func readString(argc Args) []string {
 func parsFlag(fl *flags) {
 	fl.f = flag.Int("f", 0, "fields - выбрать поля (колонки)")
 	fl.d = flag.String("d", "	", "delimiter - использовать другой разделитель")
-	fl.s = flag.Bool("s", true, "separated - только строки с разделителем")
+	fl.s = flag.Bool("s", false, "separated - только строки с разделителем")
 	flag.Parse()
 }
 
@@ -56,8 +66,7 @@ func getArgc() *Args {
 	parsFlag(&fl)
 
 	return &Args{
-		fl: fl,
-		//str: os.Args[len(os.Args)-1], // одну строку
+		fl:  fl,
 		str: flag.Args(), // передаю все строки после команды и флагов
 
 	}
