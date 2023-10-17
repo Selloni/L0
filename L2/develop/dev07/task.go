@@ -7,6 +7,8 @@ import (
 )
 
 /*
+Реализуем паттерн Fan-In
+
 === Or channel ===
 
 Реализовать функцию, которая будет объединять один или более done каналов в single канал если один из его составляющих каналов закроется.
@@ -68,15 +70,16 @@ func or(channels ...<-chan interface{}) <-chan interface{} {
 	}
 	done := make(chan interface{})
 	wg := sync.WaitGroup{}
-	wg.Add(len(channels))
+	wg.Add(len(channels)) // ожидаем выполненяи всех горутин
 	for _, ch := range channels {
 		go func(ch <-chan interface{}) {
 			defer wg.Done()
 			for c := range ch {
-				done <- c
+				done <- c // все пришедшие данные записываем в один канал
 			}
 		}(ch)
 	}
+	// как все горутины выполнятся закрываем канал
 	go func() {
 		wg.Wait()
 		close(done)

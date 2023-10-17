@@ -18,17 +18,19 @@ import (
 */
 
 func download(fileName, url string) error {
-
+	//  поулчаем содежимое страницы
 	resp, err := http.Get(url)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
+	// создаем файл куда запиешем данные
 	file, err := os.Create(fileName)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
+	// записываем из тела ответа в файл
 	_, err = io.Copy(file, resp.Body)
 	if err != nil {
 		return err
@@ -42,6 +44,8 @@ func main() {
 	if *url == "" {
 		log.Fatalln("нужен url адрес")
 	}
-	fileName := path.Base(*url)
-	download(fileName, *url)
+	fileName := path.Base(*url) // достаем последнюю часть ссылки
+	if err := download(fileName, *url); err != nil {
+		log.Fatal(err)
+	}
 }
