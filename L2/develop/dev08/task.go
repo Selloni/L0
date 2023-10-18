@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/mitchellh/go-ps"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -56,9 +57,21 @@ func commandExecution(str string) {
 		}
 		kill(command[1:])
 	} else if command[0] == "ps" {
-
+		Fps()
 	} else {
 		fork(command)
+	}
+}
+
+func Fps() {
+	fmt.Printf("%5s %-7s\n", "PID", "TTY")
+	processes, err := ps.Processes()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	for _, pp := range processes {
+		fmt.Printf("%5d %-7s\n", pp.Pid(), pp.Executable())
 	}
 }
 
