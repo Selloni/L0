@@ -5,8 +5,10 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"regexp"
+	"strconv"
 )
 
 /*
@@ -43,6 +45,7 @@ func main() {
 	ParsFlag(&fl)
 
 	files := flag.Args()
+<<<<<<< HEAD
 	if len(files) < 1 {
 		log.Fatal("ожидаю файл")
 	}
@@ -53,6 +56,14 @@ func main() {
 	for _, i := range out {
 		fmt.Println(i)
 	}
+=======
+	out, err := ReadFile(files, fl)
+	if err != nil {
+		log.Fatal(err)
+	}
+	Output(out, fl)
+
+>>>>>>> refs/remotes/origin/Selloni
 }
 
 func ParsFlag(fl *flags) {
@@ -68,6 +79,7 @@ func ParsFlag(fl *flags) {
 
 }
 
+<<<<<<< HEAD
 func ReadFile(path string, fl flags) ([]string, error) {
 	var pattern *regexp.Regexp
 	var err error
@@ -91,7 +103,97 @@ func ReadFile(path string, fl flags) ([]string, error) {
 			outStr = append(outStr, scan.Text())
 		} else if !pattern.MatchString(scan.Text()) && *fl.v {
 			//outStr = append(outStr, scan.Text())
+=======
+func ReadFile(strIn []string, fl flags) ([]string, error) {
+	outStr := make([]string, 0)
+	var (
+		fullFile []string
+	)
+	flagBC := math.Max(float64(*fl.C), float64(*fl.B))
+	flagAC := math.Max(float64(*fl.C), float64(*fl.A))
+	flagI, flagN := "", ""
+	if *fl.i {
+		flagI = "(?i)"
+	}
+	for _, path := range strIn[1:] {
+		regx := strIn[0]
+		NumLine := 1
+		file, err := os.Open(path)
+		if err != nil {
+			return nil, err
+		}
+		defer file.Close()
+		if *fl.F {
+			regx = regexp.QuoteMeta(regx)
+		}
+		pattern, err := regexp.Compile(flagI + regx)
+
+		if err != nil {
+			return nil, err
+		}
+		scan := bufio.NewScanner(file)
+		for scan.Scan() {
+			if *fl.n {
+				flagN = (strconv.Itoa(NumLine) + ":")
+			}
+			find := pattern.MatchString(scan.Text())
+			if flagBC > 0 {
+				fullFile = append(fullFile, scan.Text())
+			}
+			if find && !*fl.v {
+				if flagBC > 0 {
+					outStr = append(outStr, appendBefore(fullFile, int(flagBC), NumLine)...)
+				}
+				outStr = append(outStr, flagN+scan.Text())
+				if flagAC > 0 {
+					outStr = append(outStr, appendAfter(scan, int(flagAC))...)
+				}
+				if flagAC+flagBC > 0 {
+					outStr = append(outStr, "--")
+				}
+			} else if !find && *fl.v {
+				outStr = append(outStr, flagN+scan.Text())
+			}
+			NumLine++
+>>>>>>> refs/remotes/origin/Selloni
 		}
 	}
+	if flagAC+flagBC > 0 { // костыль
+		outStr = outStr[:len(outStr)-1]
+	}
 	return outStr, nil
+}
+
+func Output(out []string, fl flags) {
+	if *fl.c {
+		fmt.Println(len(out))
+	} else {
+		for _, i := range out {
+			fmt.Println(i)
+		}
+	}
+}
+
+func appendBefore(fullFile []string, countBefore int, numLine int) []string {
+	var tmp []string
+	for i := countBefore + 1; i > 1; i-- {
+		if numLine-i > -1 {
+			tmp = append(tmp, fullFile[numLine-i])
+		}
+	}
+	return tmp
+}
+
+func appendAfter(scan *bufio.Scanner, flagAC int) []string {
+	var tmp []string
+	for scan.Scan() {
+		if flagAC != 0 {
+			tmp = append(tmp, scan.Text())
+			flagAC--
+			if flagAC == 0 {
+				break
+			}
+		}
+	}
+	return tmp
 }

@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 rm -rf dev03
 go build
 
@@ -28,4 +29,4 @@ sort -k 2 ls_la.txt > sort.txt
 diff -s devSort.txt sort.txt
 rm sort.txt devSort.txt
 
-
+rm dev03
