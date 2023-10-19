@@ -1,6 +1,8 @@
 package main
 
-import "log"
+import (
+	"fmt"
+)
 
 /*
 	Состояние
@@ -52,18 +54,21 @@ type pauseState struct {
 
 func (p *pauseState) next() {
 	p.s.idTrack++
+	fmt.Println("трек остановлен ++ ")
 }
 func (p *pauseState) previous() {
 	p.s.idTrack--
+	fmt.Println("трек остановлен -- ")
 }
 func (p *pauseState) play() {
 	p.s.off = false
 	p.s.player = &playState{}
-	log.Printf("Play")
+	fmt.Println("Play")
 }
 func (p *pauseState) lock() {
-	p.s.player = &playState{}
-	log.Printf("lock")
+	p.s.player = &lockState{}
+	p.s.off = false
+	fmt.Println("lock")
 }
 
 type playState struct {
@@ -71,15 +76,23 @@ type playState struct {
 }
 
 func (p *playState) next() {
-
+	p.s.idTrack++
+	fmt.Println("туц туц ")
 }
 func (p *playState) previous() {
-
+	p.s.idTrack++
+	fmt.Println("цут цут ")
 }
-func (p *playState) play() {
 
+func (p *playState) play() {
+	p.s.off = true
+	fmt.Println("stop")
+	p.s.player = &pauseState{}
 }
 func (p *playState) lock() {
+	p.s.off = true
+	fmt.Println("lock")
+	p.s.player = &lockState{}
 
 }
 
@@ -87,12 +100,37 @@ type lockState struct {
 	s State
 }
 
-func (l *lockState) name() {
-
+func (p *lockState) next() {
+	fmt.Println("...")
+}
+func (p *lockState) previous() {
+	fmt.Println("...")
+}
+func (p *lockState) play() {
+	fmt.Println("...")
+}
+func (p *lockState) lock() {
+	p.s.player = &pauseState{}
+	fmt.Println("unlock")
 }
 
 type State struct {
 	player  PlayerI
 	idTrack int
 	off     bool
+}
+
+func main() {
+	pp := State{}
+	pp.player = &pauseState{}
+
+	pp.player.play()
+	fmt.Println(pp.off)
+	pp.player.next()
+	pp.player.lock()
+	pp.player.next()
+	pp.player.lock()
+	fmt.Println(pp.idTrack)
+	pp.player.play()
+	pp.player.previous()
 }
