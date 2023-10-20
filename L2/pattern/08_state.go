@@ -39,34 +39,43 @@ import (
 	 Упрощает код контекста.
 	 Недостатки
 	 Может неоправданно усложнить код, если состояний мало и они редко меняются.
+
+	Реальные примеры использования паттерна "Состояние":
+	1. Автомат продажи билетов: состояниями могут быть "ожидание ввода денег",
+	"выбор места", "оплата", "печать билета".
+	2. Редактор текста: состояниями могут быть "режим вставки",
+	"режим выделения", "режим редактирования".
+	3. Игра с различными уровнями сложности: состояниями могут быть "легкий уровень",
+	"средний уровень", "сложный уровень".
+
 */
 
 type PlayerI interface {
-	next()
-	previous()
-	play()
-	lock()
+	next(context *State)
+	previous(context *State)
+	play(context *State)
+	lock(context *State)
 }
 
 type pauseState struct {
 	s State
 }
 
-func (p *pauseState) next() {
+func (p *pauseState) next(context *State) {
 	p.s.idTrack++
 	fmt.Println("трек остановлен ++ ")
 }
-func (p *pauseState) previous() {
+func (p *pauseState) previous(context *State) {
 	p.s.idTrack--
 	fmt.Println("трек остановлен -- ")
 }
-func (p *pauseState) play() {
+func (p *pauseState) play(context *State) {
+	context.setState(&playState{})
 	p.s.off = false
-	p.s.player = &playState{}
 	fmt.Println("Play")
 }
-func (p *pauseState) lock() {
-	p.s.player = &lockState{}
+func (p *pauseState) lock(context *State) {
+	context.setState(&lockState{})
 	p.s.off = false
 	fmt.Println("lock")
 }
@@ -75,42 +84,41 @@ type playState struct {
 	s State
 }
 
-func (p *playState) next() {
+func (p *playState) next(context *State) {
 	p.s.idTrack++
 	fmt.Println("туц туц ")
 }
-func (p *playState) previous() {
+func (p *playState) previous(context *State) {
 	p.s.idTrack++
 	fmt.Println("цут цут ")
 }
 
-func (p *playState) play() {
+func (p *playState) play(context *State) {
+	context.setState(&pauseState{})
 	p.s.off = true
 	fmt.Println("stop")
-	p.s.player = &pauseState{}
 }
-func (p *playState) lock() {
+func (p *playState) lock(context *State) {
+	context.setState(&lockState{})
 	p.s.off = true
 	fmt.Println("lock")
-	p.s.player = &lockState{}
-
 }
 
 type lockState struct {
 	s State
 }
 
-func (p *lockState) next() {
+func (p *lockState) next(context *State) {
 	fmt.Println("...")
 }
-func (p *lockState) previous() {
+func (p *lockState) previous(context *State) {
 	fmt.Println("...")
 }
-func (p *lockState) play() {
+func (p *lockState) play(context *State) {
 	fmt.Println("...")
 }
-func (p *lockState) lock() {
-	p.s.player = &pauseState{}
+func (p *lockState) lock(context *State) {
+	context.setState(&pauseState{})
 	fmt.Println("unlock")
 }
 
@@ -120,17 +128,32 @@ type State struct {
 	off     bool
 }
 
+func (s *State) setState(p PlayerI) {
+	s.player = p
+}
+
+func (s *State) next() {
+	s.player.next(s)
+}
+func (s *State) previous() {
+	s.player.previous(s)
+}
+func (s *State) play() {
+	s.player.play(s)
+}
+func (s *State) lock() {
+	s.player.lock(s)
+}
+
 func main() {
 	pp := State{}
-	pp.player = &pauseState{}
-
-	pp.player.play()
+	pp.setState(&pauseState{})
+	pp.play()
 	fmt.Println(pp.off)
-	pp.player.next()
-	pp.player.lock()
-	pp.player.next()
-	pp.player.lock()
-	fmt.Println(pp.idTrack)
-	pp.player.play()
-	pp.player.previous()
+	pp.next()
+	pp.lock()
+	pp.next()
+	pp.lock()
+	pp.play()
+	pp.previous()
 }
