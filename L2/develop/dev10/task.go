@@ -5,6 +5,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"os"
@@ -28,6 +29,7 @@ go-telnet --timeout=10s host port go-telnet mysite.ru 8080 go-telnet --timeout=3
 //https://www.kelche.co/blog/go/socket-programming/
 */
 
+// храним адрес
 type ConnectOption struct {
 	Host    string
 	Port    string
@@ -35,37 +37,71 @@ type ConnectOption struct {
 }
 
 func main() {
-	_, err := run()
+	err := run()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 }
 
-func run() (net.Conn, error) {
+func run() error {
 	co := ConnectOption{}
 	if err := co.parsFlag(); err != nil {
 		log.Fatal(err)
 	}
-	dial := net.Dialer{}
-	ctx, cancel := context.WithTimeout(context.Background(), co.Timeout)
-	conn, err := dial.DialContext(ctx, "tcp", fmt.Sprintf("%s:%s", co.Host, co.Port))
-
+	// создаем конетекст для разрыва соединения
+	ctx, cancel := context.WithCancel(context.Background())
+	// соедение с сервером, возвращем интерфейс для чтения и записи данных
+	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%s", co.Host, co.Port), co.Timeout)
 	if err != nil {
-		return nil, err
+		return err
 	}
+	if err != nil {
+		return fmt.Errorf("не удалось подключитсья: %w", err)
+	}
+	// оправляем сообщение, в ответ считываем что пришло
+	output := make(chan string)
+	input := make(chan string)
+	go readServer(conn, output)
+	go sendData(conn, input)
 	for {
-		reader := bufio.NewReader(os.Stdin)
-		fmt.Print("Text to send: ")
-		text, _ := reader.ReadString('\n')
-		fmt.Fprintf(conn, text+"\n")
-		message, _ := bufio.NewReader(conn).ReadString('\n')
-		fmt.Print("Message from server: " + message)
+		select {
+		case data := <-input:
+			if _, err := conn.Write([]byte(data)); err != nil {
+				fmt.Printf("Writing error: %s\n", err)
+				return nil
+			}
+		case data := <-output:
+			fmt.Println(data)
+		case <-ctx.Done():
+			return nil
+		}
 	}
 	defer cancel()
-	return conn, nil
+	return nil
 }
 
+func readServer(conn net.Conn, ch chan<- string) {
+	scanner := bufio.NewScanner(conn)
+	for scanner.Scan() {
+		ch <- scanner.Text()
+	}
+}
+
+func sendData(conn net.Conn, ch chan<- string) {
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		text, err := reader.ReadString('\n')
+		if err != nil {
+			// Stop by EOF (Ctrl + D)
+			if err != io.EOF {
+				log.Fatalln("cannot scan stdin")
+			}
+			break
+		}
+		ch <- text
+	}
+}
 func (co *ConnectOption) parsFlag() error {
 	if len(os.Args) < 2 {
 		return fmt.Errorf("не достаточно аргументов")
