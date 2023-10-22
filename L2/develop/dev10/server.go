@@ -11,11 +11,11 @@ import (
 // простой сервер прослушивающий порт 8080
 func main() {
 	// возвращяем интерфейс для приема подключений
-	ln, err := net.Listen("tcp", ":8000")
+	ln, err := net.Listen("tcp", ":8080")
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Listening on port 8000")
+	fmt.Println("Listening on port 8080")
 	// метод для прослушивания входящих сообщений
 	conn, err := ln.Accept()
 	if err != nil {

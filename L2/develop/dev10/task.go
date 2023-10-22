@@ -5,7 +5,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"net"
 	"os"
@@ -67,13 +66,16 @@ func run() error {
 	for {
 		select {
 		case data := <-input:
+			// отправляем сообщение
 			if _, err := conn.Write([]byte(data)); err != nil {
 				fmt.Printf("Writing error: %s\n", err)
 				return nil
 			}
 		case data := <-output:
+			// выводим в сообщение что приняли
 			fmt.Println(data)
 		case <-ctx.Done():
+			conn.Close()
 			return nil
 		}
 	}
@@ -89,15 +91,12 @@ func readServer(conn net.Conn, ch chan<- string) {
 }
 
 func sendData(conn net.Conn, ch chan<- string) {
+	// новая запись
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		text, err := reader.ReadString('\n')
 		if err != nil {
-			// Stop by EOF (Ctrl + D)
-			if err != io.EOF {
-				log.Fatalln("cannot scan stdin")
-			}
-			break
+			log.Fatalln("не удалось считать")
 		}
 		ch <- text
 	}

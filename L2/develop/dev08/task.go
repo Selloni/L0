@@ -18,10 +18,8 @@ import (
 
 встроенные команды: cd/pwd/echo/kill/ps
 поддержать fork/exec команды
-конвеер на пайпах
+Допп зажание : конвеер на пайпах
 
-Реализовать утилиту netcat (nc) клиент
-принимать данные из stdin и отправлять в соединение (tcp/udp)
 Программа должна проходить все тесты. Код должен проходить проверки go vet и golint.
 */
 
@@ -35,6 +33,7 @@ func shell() {
 	pwd()
 	fmt.Print(": ")
 	reader := bufio.NewScanner(os.Stdin)
+	// считывание с терминала
 	if reader.Scan() {
 		commandExecution(reader.Text())
 	}
@@ -63,6 +62,7 @@ func commandExecution(str string) {
 	}
 }
 
+// PID процессов
 func Fps() {
 	fmt.Printf("%5s %-7s\n", "PID", "TTY")
 	processes, err := ps.Processes()
@@ -75,6 +75,7 @@ func Fps() {
 	}
 }
 
+// поддержка стандартных команд
 func fork(command []string) {
 	cmd := exec.Command(command[0], command[1:]...)
 	out, err := cmd.Output()
@@ -84,6 +85,7 @@ func fork(command []string) {
 	fmt.Println(string(out))
 }
 
+// удаление процесса
 func kill(command []string) {
 	for _, s := range command {
 		i, err := strconv.Atoi(s)
@@ -98,7 +100,9 @@ func kill(command []string) {
 	}
 }
 
+// переход попапкам
 func cd(command []string) {
+	// пеерход в домашнюю деректорию
 	if len(command) == 1 {
 		home, err := os.UserHomeDir()
 		if err != nil {
@@ -109,6 +113,7 @@ func cd(command []string) {
 			fmt.Println("Error:", err)
 			return
 		}
+		// на деректорию ниже
 	} else if command[1] == ".." {
 		wd, err := os.Getwd()
 		if err != nil {
@@ -121,6 +126,7 @@ func cd(command []string) {
 			return
 		}
 	} else {
+		// переход в подпапку
 		err := os.Chdir(command[1])
 		if err != nil {
 			fmt.Println(err)
@@ -129,6 +135,7 @@ func cd(command []string) {
 	}
 }
 
+// где сейчас находимся
 func pwd() {
 	pwd, err := os.Getwd()
 	if err != nil {
@@ -137,6 +144,7 @@ func pwd() {
 	fmt.Print(pwd)
 }
 
+// выводим сообщение
 func echo(command []string) {
 	if len(command) < 2 {
 		fmt.Println(" ")
