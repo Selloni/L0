@@ -1,5 +1,10 @@
 package main
 
+import (
+	"11/pkg/handler"
+	"11/pkg/storage"
+)
+
 /*
 === HTTP server ===
 
@@ -23,5 +28,6 @@ package main
 */
 
 func main() {
-
+	cash := storage.NewCash()
+	handler.Route(cash)
 }
