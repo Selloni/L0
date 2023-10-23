@@ -62,21 +62,21 @@ type pauseState struct {
 }
 
 func (p *pauseState) next(context *State) {
-	p.s.idTrack++
+	context.idTrack++
 	fmt.Println("трек остановлен ++ ")
 }
 func (p *pauseState) previous(context *State) {
-	p.s.idTrack--
+	context.idTrack--
 	fmt.Println("трек остановлен -- ")
 }
 func (p *pauseState) play(context *State) {
 	context.setState(&playState{})
-	p.s.off = false
+	context.off = true
 	fmt.Println("Play")
 }
 func (p *pauseState) lock(context *State) {
 	context.setState(&lockState{})
-	p.s.off = false
+	context.off = false
 	fmt.Println("lock")
 }
 
@@ -85,22 +85,22 @@ type playState struct {
 }
 
 func (p *playState) next(context *State) {
-	p.s.idTrack++
+	context.idTrack++
 	fmt.Println("туц туц ")
 }
 func (p *playState) previous(context *State) {
-	p.s.idTrack++
+	context.idTrack--
 	fmt.Println("цут цут ")
 }
 
 func (p *playState) play(context *State) {
 	context.setState(&pauseState{})
-	p.s.off = true
+	context.off = true
 	fmt.Println("stop")
 }
 func (p *playState) lock(context *State) {
 	context.setState(&lockState{})
-	p.s.off = true
+	context.off = true
 	fmt.Println("lock")
 }
 
@@ -149,11 +149,15 @@ func main() {
 	pp := State{}
 	pp.setState(&pauseState{})
 	pp.play()
+	pp.next()
+	pp.next()
+	pp.next()
+	fmt.Println(pp.idTrack)
+	pp.play()
 	fmt.Println(pp.off)
-	pp.next()
 	pp.lock()
-	pp.next()
 	pp.lock()
 	pp.play()
 	pp.previous()
+	fmt.Println(pp.idTrack)
 }
