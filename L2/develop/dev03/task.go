@@ -49,7 +49,7 @@ func main() {
 	flag.Parse()
 
 	fileName := os.Args[len(os.Args)-1]
-	list, err := ReadFile(fileName, &ff)
+	list, err := readFile(fileName, &ff)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -57,17 +57,17 @@ func main() {
 		sort.Sort(sort.Reverse(sort.StringSlice(list)))
 	}
 	if *ff.k != 0 {
-		SortOnIndex(list, *ff.k-1)
+		sortOnIndex(list, *ff.k-1)
 	}
 	if *ff.u {
-		list = DeleteDuplicates(list)
+		list = deleteDuplicates(list)
 	}
 	for _, i := range list {
 		fmt.Println(i)
 	}
 }
 
-func ReadFile(fileName string, ff *flags) ([]string, error) {
+func readFile(fileName string, ff *flags) ([]string, error) {
 	var buff, numBuff []string
 
 	file, err := os.Open(fileName)
@@ -96,7 +96,7 @@ func ReadFile(fileName string, ff *flags) ([]string, error) {
 	return buff, nil
 }
 
-func SortOnIndex(list []string, num int) {
+func sortOnIndex(list []string, num int) {
 	sort.Slice(list, func(i, j int) bool {
 		tmp1 := strings.Split(list[i], " ")
 		tmp2 := strings.Split(list[j], " ")
@@ -118,7 +118,7 @@ func sortNum(lines string) bool {
 	return false
 }
 
-func DeleteDuplicates(line []string) []string {
+func deleteDuplicates(line []string) []string {
 	newLine := make([]string, 0)
 	for i := 0; i < len(line); i++ {
 		if elemExists(newLine, line[i]) == false {

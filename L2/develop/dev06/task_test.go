@@ -4,7 +4,7 @@ import "testing"
 
 // echo "gggj  hhhjlll" | cut
 func TestWithoutFlag(t *testing.T) {
-	argc := Args{
+	argc := args{
 		fl: flags{
 			f: 0,
 			d: "\t",
@@ -20,7 +20,7 @@ func TestWithoutFlag(t *testing.T) {
 
 // echo "gg gj  hh hjll l"| cut -d " " -f 2
 func TestFlagDF(t *testing.T) {
-	argc := Args{
+	argc := args{
 		fl: flags{
 			f: 2,
 			d: " ",
@@ -40,7 +40,7 @@ func TestFlagDF(t *testing.T) {
 }
 
 func TestSeveralStr(t *testing.T) {
-	argc := Args{
+	argc := args{
 		fl: flags{
 			f: 2,
 			d: " ",
@@ -64,7 +64,7 @@ func TestSeveralStr(t *testing.T) {
 }
 
 func TestSeveralFlagS(t *testing.T) {
-	argc := Args{
+	argc := args{
 		fl: flags{
 			f: 2,
 			d: "j",

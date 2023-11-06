@@ -56,14 +56,14 @@ func commandExecution(str string) {
 		}
 		kill(command[1:])
 	} else if command[0] == "ps" {
-		Fps()
+		fps()
 	} else {
 		fork(command)
 	}
 }
 
 // PID процессов
-func Fps() {
+func fps() {
 	fmt.Printf("%5s %-7s\n", "PID", "TTY")
 	processes, err := ps.Processes()
 	if err != nil {

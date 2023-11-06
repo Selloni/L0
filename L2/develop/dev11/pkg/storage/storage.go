@@ -5,28 +5,33 @@ import (
 	"time"
 )
 
+// RequestData exported
 type RequestData struct {
 	User     string `json:"user_id"`
-	DateJson string `json:"date"`
+	DateJSON string `json:"date"`
 	Info     string `json:"info"`
 	DataTime time.Time
 }
 
+// UserEvent exported
 type UserEvent struct {
 	Text string
 	Date time.Time
 }
 
+// Cash exported
 type Cash struct {
 	Date map[string]UserEvent
 }
 
+// NewCash constructor
 func NewCash() *Cash {
 	return &Cash{
 		Date: make(map[string]UserEvent),
 	}
 }
 
+// Add called in the package handler in file event
 func (c *Cash) Add(data *RequestData) error {
 	if v, ok := c.Date[data.User]; ok {
 		if v.Date == data.DataTime {
@@ -41,6 +46,7 @@ func (c *Cash) Add(data *RequestData) error {
 	return nil
 }
 
+// Update called in the package handler in file event
 func (c *Cash) Update(data *RequestData) error {
 	if v, ok := c.Date[data.User]; ok {
 		if data.DataTime == v.Date {
@@ -51,9 +57,10 @@ func (c *Cash) Update(data *RequestData) error {
 			return nil
 		}
 	}
-	return fmt.Errorf("не найденны данные для обновления")
+	return fmt.Errorf("не найдены данные для обновления")
 }
 
+// Delete called in the package handler in file event
 func (c *Cash) Delete(data *RequestData) error {
 	if v, ok := c.Date[data.User]; ok {
 		if v.Date == data.DataTime {
@@ -65,6 +72,7 @@ func (c *Cash) Delete(data *RequestData) error {
 	return fmt.Errorf("не найден пользовател %s для удаления", data.User)
 }
 
+// FindDayEvent called in the package handler in file event
 func (c *Cash) FindDayEvent(user string, date time.Time) ([]UserEvent, error) {
 	result := make([]UserEvent, 0, 10)
 	if v, ok := c.Date[user]; ok {
@@ -73,11 +81,12 @@ func (c *Cash) FindDayEvent(user string, date time.Time) ([]UserEvent, error) {
 			result = append(result, v)
 		}
 	} else {
-		return nil, fmt.Errorf("не найдет пользователь %v", user)
+		return nil, fmt.Errorf("не найден пользователь %v", user)
 	}
 	return result, nil
 }
 
+// FindWeekEvent called in the package handler in file event
 func (c *Cash) FindWeekEvent(user string, date time.Time) ([]UserEvent, error) {
 	result := make([]UserEvent, 0, 10)
 	if v, ok := c.Date[user]; ok {
@@ -86,12 +95,14 @@ func (c *Cash) FindWeekEvent(user string, date time.Time) ([]UserEvent, error) {
 		if v.Date.After(weekStart) && v.Date.Before(weekEnd) {
 			result = append(result, v)
 		}
+
 	} else {
-		return nil, fmt.Errorf("не найдет пользователь %v", user)
+		return nil, fmt.Errorf("не найден пользователь %v", user)
 	}
 	return result, nil
 }
 
+// FindMonthEvent called in the package handler in file event
 func (c *Cash) FindMonthEvent(user string, date time.Time) ([]UserEvent, error) {
 	result := make([]UserEvent, 0, 10)
 	if v, ok := c.Date[user]; ok {
@@ -99,7 +110,7 @@ func (c *Cash) FindMonthEvent(user string, date time.Time) ([]UserEvent, error) 
 			result = append(result, v)
 		}
 	} else {
-		return nil, fmt.Errorf("не найдет пользователь %v", user)
+		return nil, fmt.Errorf("не найден пользователь %v", user)
 	}
 	return result, nil
 }

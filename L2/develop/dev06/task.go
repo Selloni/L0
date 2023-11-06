@@ -26,7 +26,7 @@ type flags struct {
 	s bool
 }
 
-type Args struct {
+type args struct {
 	fl  flags
 	str []string
 }
@@ -42,7 +42,7 @@ func main() {
 	}
 }
 
-func readString(argc *Args) ([]string, error) {
+func readString(argc *args) ([]string, error) {
 	var output []string
 	if argc.fl.f == 0 {
 		return nil, fmt.Errorf("вы должны задать список полей")
@@ -61,12 +61,12 @@ func readString(argc *Args) ([]string, error) {
 	return output, nil
 }
 
-func getArgc() *Args {
+func getArgc() *args {
 	ff := flag.Int("f", 0, "fields - выбрать поля (колонки)")
 	fd := flag.String("d", "\t", "delimiter - использовать другой разделитель")
 	fs := flag.Bool("s", false, "separated - только строки с разделителем")
 	flag.Parse()
-	return &Args{
+	return &args{
 		fl: flags{
 			*ff,
 			*fd,

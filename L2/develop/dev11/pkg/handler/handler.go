@@ -7,11 +7,7 @@ import (
 	"net/http"
 )
 
-//type Response struct {
-//	Result string `json:"result,omitempty"`
-//	Error  string `json:"error,omitempty"`
-//}
-
+// Route маршруты для веб страницы вызывается в майн
 func Route(cash *storage.Cash) error {
 	conf := config.GetConfig()
 	http.HandleFunc("/create_event", middleware(createEvent(cash)))
@@ -28,13 +24,3 @@ func Route(cash *storage.Cash) error {
 	}
 	return nil
 }
-
-//func SendResponse(w http.ResponseWriter, status int, jsonString Response) {
-//	response, err := json.Marshal(jsonString)
-//	if err != nil {
-//		// error 500 внутренняя ошибка сервера
-//		w.WriteHeader(http.StatusInternalServerError)
-//		w.Write([]byte(err.Error()))
-//	}//	w.WriteHeader(status)
-//	w.Write(response)
-//}

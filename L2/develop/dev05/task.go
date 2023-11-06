@@ -42,31 +42,17 @@ type flags struct {
 
 func main() {
 	fl := flags{}
-	ParsFlag(&fl)
+	parsFlag(&fl)
 
 	files := flag.Args()
-<<<<<<< HEAD
-	if len(files) < 1 {
-		log.Fatal("ожидаю файл")
-	}
-	out, err := ReadFile(files[len(files)-1], fl)
+	out, err := readFile(files, fl)
 	if err != nil {
 		log.Fatal(err)
 	}
-	for _, i := range out {
-		fmt.Println(i)
-	}
-=======
-	out, err := ReadFile(files, fl)
-	if err != nil {
-		log.Fatal(err)
-	}
-	Output(out, fl)
-
->>>>>>> refs/remotes/origin/Selloni
+	output(out, fl)
 }
 
-func ParsFlag(fl *flags) {
+func parsFlag(fl *flags) {
 	fl.A = flag.Int("A", 0, " печатать +N строк после совпадения")
 	fl.B = flag.Int("B", 0, "печатать +N строк до совпадения")
 	fl.C = flag.Int("C", 0, "печатать ±N строк вокруг совпадения")
@@ -79,32 +65,7 @@ func ParsFlag(fl *flags) {
 
 }
 
-<<<<<<< HEAD
-func ReadFile(path string, fl flags) ([]string, error) {
-	var pattern *regexp.Regexp
-	var err error
-	outStr := make([]string, 0)
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-	if *fl.i {
-		pattern, err = regexp.Compile("(?i)" + os.Args[1])
-	} else {
-		pattern, err = regexp.Compile(os.Args[1])
-	}
-	if err != nil {
-		return nil, err
-	}
-	scan := bufio.NewScanner(file)
-	for scan.Scan() {
-		if pattern.MatchString(scan.Text()) && !*fl.v {
-			outStr = append(outStr, scan.Text())
-		} else if !pattern.MatchString(scan.Text()) && *fl.v {
-			//outStr = append(outStr, scan.Text())
-=======
-func ReadFile(strIn []string, fl flags) ([]string, error) {
+func readFile(strIn []string, fl flags) ([]string, error) {
 	outStr := make([]string, 0)
 	var (
 		fullFile []string
@@ -155,7 +116,6 @@ func ReadFile(strIn []string, fl flags) ([]string, error) {
 				outStr = append(outStr, flagN+scan.Text())
 			}
 			NumLine++
->>>>>>> refs/remotes/origin/Selloni
 		}
 	}
 	if flagAC+flagBC > 0 { // костыль
@@ -164,7 +124,7 @@ func ReadFile(strIn []string, fl flags) ([]string, error) {
 	return outStr, nil
 }
 
-func Output(out []string, fl flags) {
+func output(out []string, fl flags) {
 	if *fl.c {
 		fmt.Println(len(out))
 	} else {

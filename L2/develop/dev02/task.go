@@ -34,14 +34,14 @@ func main() {
 	fmt.Println("напиши последовательность")
 	fmt.Fscan(os.Stdin, &tmp)
 	str = []rune(tmp)
-	buff, err := Parsing(str)
+	buff, err := parsing(str)
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println(string(buff))
 }
 
-func Parsing(str []rune) ([]rune, error) {
+func parsing(str []rune) ([]rune, error) {
 	var buff []rune
 	var (
 		tmp    rune

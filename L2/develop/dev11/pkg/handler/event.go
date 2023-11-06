@@ -10,29 +10,29 @@ import (
 	"time"
 )
 
-type ResponseError struct {
+type responseError struct {
 	str  string
 	code int
 	err  error
 }
 
-func GetData(r *http.Request) (*storage.RequestData, *ResponseError) {
+func getData(r *http.Request) (*storage.RequestData, *responseError) {
 	tmp := storage.RequestData{}
 	if r.Method != http.MethodPost {
-		return nil, &ResponseError{str: "404 Not Found", code: http.StatusNotFound, err: nil}
+		return nil, &responseError{str: "404 Not Found", code: http.StatusNotFound, err: nil}
 	}
 	b, err := io.ReadAll(r.Body)
 	if err != nil {
-		return nil, &ResponseError{str: "503 Server error", code: http.StatusServiceUnavailable, err: err}
+		return nil, &responseError{str: "503 Server error", code: http.StatusServiceUnavailable, err: err}
 	}
 	err = json.Unmarshal(b, &tmp)
 	if err != nil {
-		return nil, &ResponseError{str: "400 Incorrect input data", code: http.StatusBadRequest, err: err}
+		return nil, &responseError{str: "400 Incorrect input data", code: http.StatusBadRequest, err: err}
 	}
-	tmp.DataTime, err = time.Parse("2006-01-02", tmp.DateJson)
+	tmp.DataTime, err = time.Parse("2006-01-02", tmp.DateJSON)
 	if err != nil {
 		{
-			return nil, &ResponseError{str: "400 Incorrect input data", code: http.StatusBadRequest, err: err}
+			return nil, &responseError{str: "400 Incorrect input data", code: http.StatusBadRequest, err: err}
 		}
 	}
 	return &tmp, nil
@@ -40,7 +40,7 @@ func GetData(r *http.Request) (*storage.RequestData, *ResponseError) {
 
 func createEvent(cash *storage.Cash) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		data, responseError := GetData(r)
+		data, responseError := getData(r)
 		if responseError != nil {
 			log.Println(responseError.err)
 			http.Error(w, responseError.str, responseError.code)
@@ -59,7 +59,7 @@ func createEvent(cash *storage.Cash) http.HandlerFunc {
 
 func updateEvent(cash *storage.Cash) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		data, responseError := GetData(r)
+		data, responseError := getData(r)
 		if responseError != nil {
 			log.Println(responseError.err)
 			http.Error(w, responseError.str, responseError.code)
@@ -77,7 +77,7 @@ func updateEvent(cash *storage.Cash) http.HandlerFunc {
 
 func deleteEvent(cash *storage.Cash) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		data, responseError := GetData(r)
+		data, responseError := getData(r)
 		if responseError != nil {
 			log.Println(responseError.err)
 			http.Error(w, responseError.str, responseError.code)

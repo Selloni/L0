@@ -37,18 +37,18 @@ func findAnagramme(tmp []string) map[string][]string {
 		buff[i] = strings.ToLower(tmp[i])
 	}
 	// храню каждое слово и сумму букв по ascii
-	countAscii := make(map[string]int32)
-	for world, _ := range buff {
-		_, ok := countAscii[buff[world]]
+	countASCII := make(map[string]int32)
+	for world := range buff {
+		_, ok := countASCII[buff[world]]
 		if !ok { // избаляемся от дублей
 			for _, i := range buff[world] {
-				countAscii[buff[world]] += i // складываем буквы по ascii
+				countASCII[buff[world]] += i // складываем буквы по ascii
 			}
 		}
 	}
 	// результирующая мапа
-	allMap := fillMyMap(countAscii, buff)
-	for k, _ := range allMap {
+	allMap := fillMyMap(countASCII, buff)
+	for k := range allMap {
 		if len(allMap[k]) < 2 { // удаляем мапу с единственным значением
 			delete(allMap, k)
 		}
@@ -57,23 +57,23 @@ func findAnagramme(tmp []string) map[string][]string {
 	return allMap
 }
 
-func fillMyMap(countAscii map[string]int32, buff []string) map[string][]string {
+func fillMyMap(countASCII map[string]int32, buff []string) map[string][]string {
 	myMap := make(map[string][]string)
-	for i, _ := range buff {
+	for i := range buff {
 		// костыль что бы избежать повторения мап
 		var asciiNum int32
 		_, ok := myMap[buff[i]]
 		// запсиываем первое совпадение и удаляем для избежания повторений
 		if !ok {
 			myMap[(buff[i])] = []string{}
-			asciiNum = countAscii[buff[i]]
-			delete(countAscii, buff[i])
+			asciiNum = countASCII[buff[i]]
+			delete(countASCII, buff[i])
 		}
 		// сравниваме по сумме ascii символов, если совпадает значит принадлеит одному подмножеству
-		for k, v := range countAscii {
+		for k, v := range countASCII {
 			if asciiNum == v {
 				myMap[buff[i]] = append(myMap[buff[i]], k)
-				delete(countAscii, k)
+				delete(countASCII, k)
 			}
 
 		}

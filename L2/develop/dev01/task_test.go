@@ -6,7 +6,7 @@ import (
 )
 
 func TestTime(t *testing.T) {
-	tt, err := MyTime()
+	tt, err := myTime()
 	if err != nil {
 		t.Errorf("ошибка получения времени")
 		return

@@ -28,7 +28,7 @@ go-telnet --timeout=10s host port go-telnet mysite.ru 8080 go-telnet --timeout=3
 //https://www.kelche.co/blog/go/socket-programming/
 */
 
-// храним адрес
+// ConnectOption храним адрес
 type ConnectOption struct {
 	Host    string
 	Port    string
@@ -50,6 +50,7 @@ func run() error {
 	}
 	// создаем конетекст для разрыва соединения
 	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	// соедение с сервером, возвращем интерфейс для чтения и записи данных
 	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%s", co.Host, co.Port), co.Timeout)
 	if err != nil {
@@ -79,8 +80,7 @@ func run() error {
 			return nil
 		}
 	}
-	defer cancel()
-	return nil
+	//return nil
 }
 
 func readServer(conn net.Conn, ch chan<- string) {
