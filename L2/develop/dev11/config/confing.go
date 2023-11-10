@@ -14,8 +14,9 @@ type MyConfig struct {
 var instance *MyConfig
 var once sync.Once
 
+// патерн синглтон
+// поулчаем данные с конфиг файла
 func GetConfig() *MyConfig {
-	// патерн сингл тон
 	once.Do(func() {
 		instance = &MyConfig{}
 		if err := cleanenv.ReadConfig("../config/config.yml", instance); err != nil {

@@ -16,6 +16,7 @@ type responseError struct {
 	err  error
 }
 
+// записываем дату из запроса или конкретную ошибку
 func getData(r *http.Request) (*storage.RequestData, *responseError) {
 	tmp := storage.RequestData{}
 	if r.Method != http.MethodPost {
@@ -38,6 +39,7 @@ func getData(r *http.Request) (*storage.RequestData, *responseError) {
 	return &tmp, nil
 }
 
+// добаляем ивент в хранилище
 func createEvent(cash *storage.Cash) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		data, responseError := getData(r)
@@ -51,12 +53,13 @@ func createEvent(cash *storage.Cash) http.HandlerFunc {
 			http.Error(w, fmt.Sprintf("400 %s", err), http.StatusBadRequest)
 			return
 		}
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusOK) // возвращет статус 200
 		w.Write([]byte(fmt.Sprintf("Успешно created мероприятие %s для пользователя в %s", data.User, data.DataTime)))
 		log.Println("мероприятие добавленно")
 	}
 }
 
+// обновляем данне
 func updateEvent(cash *storage.Cash) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		data, responseError := getData(r)
@@ -75,6 +78,7 @@ func updateEvent(cash *storage.Cash) http.HandlerFunc {
 	}
 }
 
+// удаляем данные
 func deleteEvent(cash *storage.Cash) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		data, responseError := getData(r)
@@ -93,15 +97,16 @@ func deleteEvent(cash *storage.Cash) http.HandlerFunc {
 	}
 }
 
+// поулчаем ивенты в определнный день
 func eventsForDay(cash *storage.Cash) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			http.Error(w, "404 Не найдена", http.StatusNotFound)
 			return
 		}
-		query := r.URL.Query()
-		user := query.Get("user_id")
-		date, err := time.Parse("2006-01-02", query.Get("date"))
+		query := r.URL.Query()                                   // поулчаем всю строку запроса
+		user := query.Get("user_id")                             // получаем со строки запроса user id
+		date, err := time.Parse("2006-01-02", query.Get("date")) // в каком виде должна быть дата
 		if err != nil {
 			http.Error(w, "400 Не коректные данные", http.StatusBadRequest)
 			return
@@ -111,16 +116,18 @@ func eventsForDay(cash *storage.Cash) http.HandlerFunc {
 			http.Error(w, fmt.Sprintf("503 %s", err), http.StatusServiceUnavailable)
 			return
 		}
-		b, err := json.Marshal(event)
+		b, err := json.Marshal(event) // упаковываем данные для передачи через json
 		if err != nil {
 			http.Error(w, "503 Ошибка сервера", http.StatusServiceUnavailable)
 			return
 		}
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(fmt.Sprintf("День - %s\n", user)))
-		w.Write(b)
+		w.Write(b) // выводи информацию на странице
 	}
 }
+
+// поулчание мероприятий на неделе
 func eventsForWeek(cash *storage.Cash) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
@@ -150,6 +157,7 @@ func eventsForWeek(cash *storage.Cash) http.HandlerFunc {
 	}
 }
 
+// мероприятия в месяц
 func eventsForMonth(cash *storage.Cash) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
