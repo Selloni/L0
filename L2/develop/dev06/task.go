@@ -42,8 +42,9 @@ func main() {
 	}
 }
 
+// разделяем строку на лисксемы
 func readString(argc *args) ([]string, error) {
-	var output []string
+	var output []string // запись результата
 	if argc.fl.f == 0 {
 		return nil, fmt.Errorf("вы должны задать список полей")
 	}
@@ -61,6 +62,7 @@ func readString(argc *args) ([]string, error) {
 	return output, nil
 }
 
+// считываем флаги
 func getArgc() *args {
 	ff := flag.Int("f", 0, "fields - выбрать поля (колонки)")
 	fd := flag.String("d", "\t", "delimiter - использовать другой разделитель")

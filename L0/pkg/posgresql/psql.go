@@ -1,7 +1,7 @@
 package posgresql
 
 import (
-	"L0/L0/interal/db"
+	"L0/interal/db"
 	"L0/pkg/inmemory"
 	"context"
 	"fmt"

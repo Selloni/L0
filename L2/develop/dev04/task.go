@@ -30,6 +30,7 @@ func main() {
 	fmt.Println(findAnagramme(ss))
 }
 
+// находим аннаграмы и заполняем множетсва
 func findAnagramme(tmp []string) map[string][]string {
 	// забыл про нижний регист, грубое решение, зарее переводим в нижний регистр
 	buff := make([]string, len(tmp))
@@ -57,6 +58,7 @@ func findAnagramme(tmp []string) map[string][]string {
 	return allMap
 }
 
+// Заполнение мапы итоговым результатом
 func fillMyMap(countASCII map[string]int32, buff []string) map[string][]string {
 	myMap := make(map[string][]string)
 	for i := range buff {
@@ -69,13 +71,12 @@ func fillMyMap(countASCII map[string]int32, buff []string) map[string][]string {
 			asciiNum = countASCII[buff[i]]
 			delete(countASCII, buff[i])
 		}
-		// сравниваме по сумме ascii символов, если совпадает значит принадлеит одному подмножеству
+		// сравниваме по сумме ascii символов, если совпадает значит принадлежит одному подмножеству
 		for k, v := range countASCII {
 			if asciiNum == v {
 				myMap[buff[i]] = append(myMap[buff[i]], k)
 				delete(countASCII, k)
 			}
-
 		}
 	}
 	return myMap

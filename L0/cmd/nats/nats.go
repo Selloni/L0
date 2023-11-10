@@ -1,7 +1,8 @@
 package main
 
 import (
-	"L0/L0/interal/db"
+	"L0/interal/db"
+	"github.com/nats-io/stan.go"
 	"log"
 	"os"
 )

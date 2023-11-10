@@ -35,11 +35,13 @@ import (
 Программа должна проходить все тесты. Код должен проходить проверки go vet и golint.
 */
 
+// храним значение флагов
 type flags struct {
 	n, r, u *bool
 	k       *int
 }
 
+// парсим флаги
 func main() {
 	ff := flags{}
 	ff.k = flag.Int("k", 0, "указание колонки для сортировки")
@@ -67,9 +69,9 @@ func main() {
 	}
 }
 
+// считываем данные с файла
 func readFile(fileName string, ff *flags) ([]string, error) {
 	var buff, numBuff []string
-
 	file, err := os.Open(fileName)
 	if err != nil {
 		return nil, err
@@ -96,6 +98,7 @@ func readFile(fileName string, ff *flags) ([]string, error) {
 	return buff, nil
 }
 
+// сортировка по конкретной колонке
 func sortOnIndex(list []string, num int) {
 	sort.Slice(list, func(i, j int) bool {
 		tmp1 := strings.Split(list[i], " ")
@@ -110,6 +113,7 @@ func sortOnIndex(list []string, num int) {
 	})
 }
 
+// строка начинаеться по цифре, сортруем по этой цифре
 func sortNum(lines string) bool {
 	if len(lines) > 0 {
 		tmp := rune(lines[0])
@@ -118,6 +122,7 @@ func sortNum(lines string) bool {
 	return false
 }
 
+// удаляем повторяющиеся строчки
 func deleteDuplicates(line []string) []string {
 	newLine := make([]string, 0)
 	for i := 0; i < len(line); i++ {
@@ -128,6 +133,7 @@ func deleteDuplicates(line []string) []string {
 	return newLine
 }
 
+// проверка строки на повторение
 func elemExists(newLine []string, elem string) bool {
 	for _, v := range newLine {
 		if v == elem {

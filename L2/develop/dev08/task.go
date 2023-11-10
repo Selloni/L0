@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/mitchellh/go-ps"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -64,15 +63,15 @@ func commandExecution(str string) {
 
 // PID процессов
 func fps() {
-	fmt.Printf("%5s %-7s\n", "PID", "TTY")
-	processes, err := ps.Processes()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	for _, pp := range processes {
-		fmt.Printf("%5d %-7s\n", pp.Pid(), pp.Executable())
-	}
+	//fmt.Printf("%5s %-7s\n", "PID", "TTY")
+	//processes, err := ps.Processes()
+	//if err != nil {
+	//	fmt.Println(err)
+	//	return
+	//}
+	//for _, pp := range processes {
+	//	fmt.Printf("%5d %-7s\n", pp.Pid(), pp.Executable())
+	//}
 }
 
 // поддержка стандартных команд

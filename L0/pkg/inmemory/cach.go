@@ -1,7 +1,7 @@
 package inmemory
 
 import (
-	"L0/L0/interal/db"
+	"L0/interal/db"
 )
 
 type Cash interface {

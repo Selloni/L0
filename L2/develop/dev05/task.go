@@ -29,6 +29,7 @@ import (
 Программа должна проходить все тесты. Код должен проходить проверки go vet и golint.
 */
 
+// структура для флагов
 type flags struct {
 	A *int
 	B *int
@@ -43,7 +44,6 @@ type flags struct {
 func main() {
 	fl := flags{}
 	parsFlag(&fl)
-
 	files := flag.Args()
 	out, err := readFile(files, fl)
 	if err != nil {
@@ -62,22 +62,21 @@ func parsFlag(fl *flags) {
 	fl.F = flag.Bool("F", false, "точное совпадение со строкой, не паттерн")
 	fl.n = flag.Bool("n", false, "тпечатать номер строки")
 	flag.Parse()
-
 }
 
+// считывает найденную строчку из файла в слайс
 func readFile(strIn []string, fl flags) ([]string, error) {
 	outStr := make([]string, 0)
-	var (
-		fullFile []string
-	)
+	var fullFile []string
+	// логика флагов схожа, при мульти флагах выбираем большее чило для вывода строк
 	flagBC := math.Max(float64(*fl.C), float64(*fl.B))
 	flagAC := math.Max(float64(*fl.C), float64(*fl.A))
-	flagI, flagN := "", ""
+	flagI, flagN := "", "" // доп параметры флагов
 	if *fl.i {
 		flagI = "(?i)"
 	}
 	for _, path := range strIn[1:] {
-		regx := strIn[0]
+		regx := strIn[0] // шаблон для поиска
 		NumLine := 1
 		file, err := os.Open(path)
 		if err != nil {
@@ -97,7 +96,7 @@ func readFile(strIn []string, fl flags) ([]string, error) {
 			if *fl.n {
 				flagN = (strconv.Itoa(NumLine) + ":")
 			}
-			find := pattern.MatchString(scan.Text())
+			find := pattern.MatchString(scan.Text()) // найденное совпадение с паттерном
 			if flagBC > 0 {
 				fullFile = append(fullFile, scan.Text())
 			}
@@ -112,10 +111,10 @@ func readFile(strIn []string, fl flags) ([]string, error) {
 				if flagAC+flagBC > 0 {
 					outStr = append(outStr, "--")
 				}
-			} else if !find && *fl.v {
+			} else if !find && *fl.v { // записывает не совпадающих строк
 				outStr = append(outStr, flagN+scan.Text())
 			}
-			NumLine++
+			NumLine++ // счетчик линй
 		}
 	}
 	if flagAC+flagBC > 0 { // костыль
@@ -124,6 +123,7 @@ func readFile(strIn []string, fl flags) ([]string, error) {
 	return outStr, nil
 }
 
+// вывожу колиство строк или найденные строки
 func output(out []string, fl flags) {
 	if *fl.c {
 		fmt.Println(len(out))
@@ -134,6 +134,7 @@ func output(out []string, fl flags) {
 	}
 }
 
+// запись строк до найденного сопадения
 func appendBefore(fullFile []string, countBefore int, numLine int) []string {
 	var tmp []string
 	for i := countBefore + 1; i > 1; i-- {
@@ -144,6 +145,7 @@ func appendBefore(fullFile []string, countBefore int, numLine int) []string {
 	return tmp
 }
 
+// запись строк после найденного экземпляра
 func appendAfter(scan *bufio.Scanner, flagAC int) []string {
 	var tmp []string
 	for scan.Scan() {

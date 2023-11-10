@@ -64,6 +64,7 @@ func main() {
 
 }
 
+// обьединяем каналы в один канал
 func or(channels ...<-chan interface{}) <-chan interface{} {
 	if len(channels) == 0 {
 		return nil

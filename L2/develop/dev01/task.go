@@ -27,6 +27,7 @@ func main() {
 	fmt.Printf("Текущие время: %v\n", tt)
 }
 
+// получаем точное время из адреса
 func myTime() (time.Time, error) {
 	tm, err := ntp.Time("0.beevik-ntp.pool.ntp.org")
 	if err != nil {

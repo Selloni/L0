@@ -41,12 +41,13 @@ func main() {
 	fmt.Println(string(buff))
 }
 
+// парсим строку
 func parsing(str []rune) ([]rune, error) {
 	var buff []rune
 	var (
 		tmp    rune
 		err    error
-		letter bool // проверка что буква встречаеться
+		letter bool // проверка что буква встречается
 	)
 	for i := 0; i < len(str); i++ {
 		n := 1
@@ -58,7 +59,7 @@ func parsing(str []rune) ([]rune, error) {
 			if !letter {
 				return nil, fmt.Errorf("не коректный ввод")
 			}
-			n, err = strconv.Atoi(string(str[i])) // переводим в привычный вид сроку, после в число,для цикда
+			n, err = strconv.Atoi(string(str[i])) // переводим в привычный вид сроку, после в число,для цикла
 			if err != nil {
 				return nil, err
 			}
